@@ -1,0 +1,27 @@
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# next.js
+apps/web/.next/
+apps/web/out/
+
+# expo
+apps/mobile/.expo/
+apps/mobile/dist/
+
+# env files
+.env
+.env.local
+.env.production
+.env.staging
+.env*.local
+
+# vercel
+.vercel
+
+# misc
+.DS_Store
+*.pem
+*.tsbuildinfo
