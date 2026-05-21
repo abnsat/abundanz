@@ -197,17 +197,47 @@ The mobile app reads `EXPO_PUBLIC_API_URL` to know where to call the Next.js API
 
 ## Database Migrations
 
-Migrations live in `packages/shared/drizzle/`. Drizzle Kit handles generation and migration.
+Migration files live in `packages/shared/drizzle/`. Schema is defined in `packages/shared/src/db/schema.ts`.
+
+### Local development
+
+After editing the schema, push changes directly to your local DB (no migration file created):
 
 ```bash
-# Generate a new migration after editing packages/shared/src/db/schema.ts
-pnpm db:generate
-
-# Apply pending migrations
-pnpm db:migrate
+pnpm db:push
 ```
 
-Requires `DATABASE_URL` to be set in your environment (or in `packages/shared/.env`).
+### Shipping a schema change to production
+
+**1. Generate the migration file**
+
+```bash
+pnpm db:generate
+```
+
+Creates a new SQL file in `packages/shared/drizzle/` (e.g. `0001_add_watch_history.sql`). Review it before applying.
+
+**2. Commit the migration file with the schema change**
+
+Both `src/db/schema.ts` and the new file in `drizzle/` should be committed together.
+
+**3. Apply to production via Supabase SQL Editor**
+
+Open the generated `.sql` file, copy its contents, and paste into:
+
+**Supabase dashboard → SQL Editor → New query → Run**
+
+The `-->statement-breakpoint` markers in the file are drizzle comments — Postgres ignores them, leave them in.
+
+> **Why SQL Editor instead of `pnpm db:migrate`?** The initial schema (`0000_great_shadow_king.sql`) was applied manually, so drizzle's migration tracking table is not initialised. Running `db:migrate` would attempt to re-apply it and fail with "already exists" errors.
+
+### Quick reference
+
+| Situation | Command |
+|---|---|
+| Testing schema changes locally | `pnpm db:push` |
+| Creating a production-ready migration | `pnpm db:generate` |
+| Applying to production | Paste generated SQL into Supabase SQL Editor |
 
 ---
 
@@ -259,8 +289,7 @@ From the project root:
 | `pnpm dev:web` | Start Next.js dev server |
 | `pnpm dev:mobile` | Start Expo dev server |
 | `pnpm build:web` | Production build of the web app |
-| `pnpm db:push` | Push schema directly to DB (local dev) |
+| `pnpm db:push` | Push schema directly to local DB (no migration file) |
 | `pnpm db:generate` | Generate versioned migration file from schema changes |
-| `pnpm db:migrate` | Apply generated migrations (production) |
 
 ---
