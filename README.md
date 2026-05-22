@@ -280,6 +280,48 @@ eas build --platform android
 
 ---
 
+## Switching to a Custom Domain
+
+When moving from `abundanz-web.vercel.app` to a real domain, update every place the URL is registered. Missing any one of these will break OAuth or email confirmation links.
+
+### 1. Vercel — add the domain
+
+Vercel dashboard → project → **Settings → Domains** → add your domain. Vercel will give you DNS records to configure.
+
+### 2. DNS provider
+
+Point your domain to Vercel using the A/CNAME records Vercel provides (step above).
+
+### 3. Vercel — update env var
+
+Settings → Environment Variables → `NEXT_PUBLIC_APP_URL` → change to `https://yourdomain.com`. Then **redeploy** (Deployments → Redeploy, uncheck "use existing build cache").
+
+> This env var is baked into the build — it controls the OAuth redirect URL and email confirmation links. A redeploy is required for the change to take effect.
+
+### 4. Supabase — URL Configuration
+
+Supabase dashboard → **Authentication → URL Configuration**:
+- **Site URL**: `https://yourdomain.com`
+- **Redirect URLs**: add `https://yourdomain.com/**` (keep the old Vercel URL until DNS has fully propagated)
+
+### 5. Google Cloud Console — OAuth consent screen
+
+APIs & Services → **OAuth consent screen** → Edit:
+- **App domain / Homepage**: `https://yourdomain.com`
+- **Privacy Policy / Terms of Service URLs**: update if hosted on the old URL
+
+> The **Authorized redirect URI** (`https://zrrfilmvgttsnpheiwmc.supabase.co/auth/v1/callback`) does **not** change — Google OAuth always callbacks through Supabase's domain, not yours.
+
+### 6. `apps/web/.env.local` — update the comment
+
+```env
+#NEXT_PUBLIC_APP_URL=https://yourdomain.com
+```
+
+This file is not deployed — it's just a local reference so the production value is documented.
+
+---
+
 ## Available Scripts
 
 From the project root:
