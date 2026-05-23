@@ -167,12 +167,62 @@ pnpm dev:web
 
 ### 6. Run the mobile app
 
+For iOS Simulator, **do not use Expo Go** — use a local development build. Expo Go's bundled React Native runtime conflicts with our SDK 54 / RN 0.81 packages. The dev build compiles a standalone app that matches our exact package versions.
+
 ```bash
-pnpm dev:mobile
-# Then press:
-#   i — open iOS Simulator (Mac only)
-#   a — open Android Emulator
-#   Scan QR code with Expo Go app on a real device
+cd apps/mobile
+npx expo run:ios --device <SIMULATOR-UDID>
+```
+
+To find a simulator UDID:
+```bash
+xcrun simctl list devices available | grep "iPhone 16 Pro"
+```
+
+First build takes 5–10 minutes (compiles native code with Xcode). Subsequent reloads are fast — just press `r` in the Metro terminal or `Cmd+R` in the simulator.
+
+---
+
+## Mobile setup gotchas
+
+A few non-obvious requirements specific to this Expo SDK 54 + pnpm monorepo setup.
+
+### Xcode and simulator
+
+- **Xcode 16+** required (Xcode 14 cannot build RN 0.81)
+- **iOS 18+ simulator runtime** — download via Xcode → Settings → Platforms, or `xcodebuild -downloadPlatform iOS`
+- macOS 15 (Sequoia) users: download Xcode 16 from [developer.apple.com/download/applications](https://developer.apple.com/download/applications/) — the App Store version requires newer macOS
+
+### CocoaPods SSL workaround
+
+The system Ruby on macOS ships with outdated SSL certificates which causes `pod install` to fail with `certificate verify failed`. Run pod commands with an explicit cert file:
+
+```bash
+SSL_CERT_FILE=/etc/ssl/cert.pem pod install
+```
+
+### pnpm hoisted layout
+
+`.npmrc` contains `node-linker=hoisted`. This is **required** — Metro cannot resolve modules through pnpm's default symlinked node_modules layout in a monorepo. Do not remove this.
+
+### Upstream patches (`patches/` directory)
+
+Two `pnpm patch` files fix bugs in Expo SDK 54 that crash the app on launch with React Native 0.81:
+
+| Patch | Bug fixed |
+|---|---|
+| `expo-router@4.0.22.patch` | `expo-router/build/getDevServer/index.native.js` assigns the entire RN ESM module object to `exports.getDevServer` instead of `.default`. Calling it throws `getDevServer is not a function (it is Object)`. |
+| `@expo__metro-runtime@4.0.1.patch` | `messageSocket.native.ts` calls `require('.../getDevServer')()` and `new (require('.../WebSocket'))()` without `.default`. Same root cause — RN 0.81 changed these to ES module default exports. |
+
+Patches are automatically re-applied on every `pnpm install` via the `pnpm.patchedDependencies` block in the root `package.json`. If you upgrade Expo SDK or React Native, check whether these bugs have been fixed upstream and remove the patches if so.
+
+### After updating native dependencies
+
+Any time you add a package with native code (anything with iOS/Android bindings) you must re-run pod install:
+
+```bash
+cd apps/mobile/ios
+SSL_CERT_FILE=/etc/ssl/cert.pem pod install
 ```
 
 ---

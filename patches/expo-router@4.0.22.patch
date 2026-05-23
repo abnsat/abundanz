@@ -1,0 +1,12 @@
+diff --git a/build/getDevServer/index.native.js b/build/getDevServer/index.native.js
+index f17cd605b67c1c344c7903b317f5eaea7e23aeae..d668407299c6017c69511946a4956cd7af4fea1d 100644
+--- a/build/getDevServer/index.native.js
++++ b/build/getDevServer/index.native.js
+@@ -1,5 +1,6 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.getDevServer = void 0;
+-exports.getDevServer = require('react-native/Libraries/Core/Devtools/getDevServer');
++const _mod = require('react-native/Libraries/Core/Devtools/getDevServer');
++exports.getDevServer = _mod.default || _mod;
+ //# sourceMappingURL=index.native.js.map

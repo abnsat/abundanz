@@ -1,0 +1,26 @@
+diff --git a/src/messageSocket.native.ts b/src/messageSocket.native.ts
+index 1d7c93325d1af908040d6f5b7ccf7e990b040c3c..8db812eee1cc3669abd879db7fff4c3709f1273f 100644
+--- a/src/messageSocket.native.ts
++++ b/src/messageSocket.native.ts
+@@ -1,7 +1,10 @@
+ /* eslint-env browser */
+ 
+ function createWebSocketConnection(path: string = '/message') {
+-  const getDevServer = require('react-native/Libraries/Core/Devtools/getDevServer');
++  // RN 0.81+ exports these as ES modules; require() returns the module object,
++  // so we must access .default explicitly to get the function/class.
++  const getDevServerModule = require('react-native/Libraries/Core/Devtools/getDevServer');
++  const getDevServer = getDevServerModule.default || getDevServerModule;
+   const devServer = getDevServer();
+   if (!devServer.bundleLoadedFromServer) {
+     throw new Error('Cannot create devtools websocket connections in embedded environments.');
+@@ -9,7 +12,8 @@ function createWebSocketConnection(path: string = '/message') {
+ 
+   const devServerUrl = new URL(devServer.url);
+   const serverScheme = devServerUrl.protocol === 'https:' ? 'wss' : 'ws';
+-  const WebSocket = require('react-native/Libraries/WebSocket/WebSocket');
++  const WebSocketModule = require('react-native/Libraries/WebSocket/WebSocket');
++  const WebSocket = WebSocketModule.default || WebSocketModule;
+   return new WebSocket(`${serverScheme}://${devServerUrl.host}${path}`);
+ }
+ 

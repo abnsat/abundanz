@@ -1,3 +1,4 @@
+import 'react-native-url-polyfill/auto'
 import { useEffect, useState } from 'react'
 import { Slot, useRouter, useSegments } from 'expo-router'
 import { Session } from '@supabase/supabase-js'

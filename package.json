@@ -12,5 +12,11 @@
   "engines": {
     "node": ">=20",
     "pnpm": ">=8"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "expo-router@4.0.22": "patches/expo-router@4.0.22.patch",
+      "@expo/metro-runtime@4.0.1": "patches/@expo__metro-runtime@4.0.1.patch"
+    }
   }
 }
