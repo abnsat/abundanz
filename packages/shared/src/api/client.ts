@@ -30,6 +30,12 @@ export function createApiClient(baseUrl: string, getToken: () => Promise<string 
 
     getVideo: (videoId: string) =>
       request<{ video: import('../types').Video }>(`/api/videos/${videoId}`),
+
+    getSubscription: () =>
+      request<{ isSubscribed: boolean }>('/api/subscription'),
+
+    syncSubscription: () =>
+      request<{ isSubscribed: boolean }>('/api/subscription/sync', { method: 'POST' }),
   }
 }
 

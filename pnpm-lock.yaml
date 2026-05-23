@@ -51,6 +51,9 @@ importers:
       react-native:
         specifier: 0.81.5
         version: 0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0)
+      react-native-purchases:
+        specifier: ^10.1.2
+        version: 10.1.2(react-native@0.81.5)(react@19.1.0)
       react-native-safe-area-context:
         specifier: ^5.3.0
         version: 5.8.0(react-native@0.81.5)(react@19.1.0)
@@ -91,6 +94,9 @@ importers:
       react-dom:
         specifier: 19.2.4
         version: 19.2.4(react@19.2.4)
+      stripe:
+        specifier: ^22.1.1
+        version: 22.1.1(@types/node@20.19.41)
     devDependencies:
       '@paralleldrive/cuid2':
         specifier: ^2.2.2
@@ -3279,6 +3285,20 @@ packages:
     resolution: {integrity: sha512-9/hhMte12Kgu+pMnLfA4EWJ0OQmIEAMVMX06FPH2yGkEQSQ3JhhCN/GkcRikzQhtEi97VYYQA15umptBUShcOQ==}
     dependencies:
       nanoid: 3.3.12
+    dev: false
+
+  /@revenuecat/purchases-js-hybrid-mappings@18.7.0:
+    resolution: {integrity: sha512-UcDYm8eFvtzLFW4lWQc61eZhCiOYpauTzfer4uzikJoKGIyDNdaGF/LmCqDnRsL9DCiHJ8IQu2lD6qUhGaTGxg==}
+    dependencies:
+      '@revenuecat/purchases-js': 1.40.0
+    dev: false
+
+  /@revenuecat/purchases-js@1.40.0:
+    resolution: {integrity: sha512-fSJWo2CWJsX+WxQG5vMj4RhYo04zTXILTyKPsQATBZSYuQAaD7TpgClAtrktLc3iYv+M0vZedqKqRTxjZGPZXw==}
+    dev: false
+
+  /@revenuecat/purchases-typescript-internal@18.7.0:
+    resolution: {integrity: sha512-1PjmYxzspgN9WizwbA247viT3h8bxtDoz6AIu8SkXrYm6RF1VTX7/awqiiEpsWCUMJMHydnLik+OFfXK03Jv9A==}
     dev: false
 
   /@rtsao/scc@1.1.0:
@@ -8257,6 +8277,22 @@ packages:
       react-native: 0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0)
     dev: false
 
+  /react-native-purchases@10.1.2(react-native@0.81.5)(react@19.1.0):
+    resolution: {integrity: sha512-NYU7a2VxvjF9pijsTqbly/39PfVY62c/spUpO26kc/SnqY5UG5y+UNfBdplRnFElbt4nM9AFN5bLkdGqT3z6/Q==}
+    peerDependencies:
+      react: '>= 16.6.3'
+      react-native: '>= 0.73.0'
+      react-native-web: '*'
+    peerDependenciesMeta:
+      react-native-web:
+        optional: true
+    dependencies:
+      '@revenuecat/purchases-js-hybrid-mappings': 18.7.0
+      '@revenuecat/purchases-typescript-internal': 18.7.0
+      react: 19.1.0
+      react-native: 0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0)
+    dev: false
+
   /react-native-safe-area-context@5.8.0(react-native@0.81.5)(react@19.1.0):
     resolution: {integrity: sha512-t+ZsAVzY/wWzzx34vqGbo3/as9EEESJdbyZNL7Yg5EYX+toYMtMqFoDDCvqZUi35eeGVsXc6pAaEk4edMwbuCQ==}
     peerDependencies:
@@ -9010,6 +9046,18 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
     dev: true
+
+  /stripe@22.1.1(@types/node@20.19.41):
+    resolution: {integrity: sha512-cmodIYP27tBkJ8G7DuGgWw0PFuemlFZbuF3Wwr1TrjFjUa3T7NIgCe6TVwX8BO2ynu+xtTuDGfHafNDCPt9lXA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+    dependencies:
+      '@types/node': 20.19.41
+    dev: false
 
   /structured-headers@0.4.1:
     resolution: {integrity: sha512-0MP/Cxx5SzeeZ10p/bZI0S6MpgD+yxAhi1BOQ34jgnMXsCq3j1t6tQnZu+KdlL7dvJTLT3g9xN8tl10TqgFMcg==}

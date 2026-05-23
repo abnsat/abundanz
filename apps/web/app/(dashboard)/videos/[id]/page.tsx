@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { VideoPlayer } from '@/app/components/VideoPlayer'
+import { isSubscribed } from '@/utils/subscription'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -14,6 +15,7 @@ export default async function VideoPage({ params }: Props) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+  if (!await isSubscribed(user.id)) redirect('/pricing')
 
   const { id } = await params
   const [video] = await db.select().from(videos).where(eq(videos.id, id))

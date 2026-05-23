@@ -8,10 +8,9 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native'
-import { useRouter, type Href } from 'expo-router'
+import { useRouter, type Href, Link } from 'expo-router'
 import type { Video } from '@abundanz/shared'
 import { api } from '@/utils/api'
-import { supabase } from '@/utils/supabase'
 
 export default function HomeScreen() {
   const [videos, setVideos] = useState<Video[]>([])
@@ -37,9 +36,9 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.logo}>Abundanz</Text>
-        <TouchableOpacity onPress={() => supabase.auth.signOut()}>
-          <Text style={styles.signOut}>Sign out</Text>
-        </TouchableOpacity>
+        <Link href="/(app)/settings" style={styles.settingsLink}>
+          <Text style={styles.signOut}>Settings</Text>
+        </Link>
       </View>
 
       {videos.length === 0 ? (
@@ -87,6 +86,7 @@ const styles = StyleSheet.create({
   },
   logo: { color: '#fff', fontSize: 22, fontWeight: 'bold' },
   signOut: { color: '#71717a', fontSize: 14 },
+  settingsLink: { color: '#71717a' },
   list: { padding: 12 },
   row: { gap: 8 },
   card: { flex: 1, marginBottom: 12 },

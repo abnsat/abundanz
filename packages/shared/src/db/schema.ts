@@ -28,5 +28,8 @@ export const subscriptions = pgTable('subscriptions', {
   source: subscriptionSourceEnum('source'),
   expiresAt: timestamp('expires_at', { withTimezone: true }),
   revenueCatCustomerId: text('revenue_cat_customer_id'),
+  stripeCustomerId: text('stripe_customer_id'),
+  stripeSubscriptionId: text('stripe_subscription_id'),
+  cancelAtPeriodEnd: boolean('cancel_at_period_end').default(false).notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 })

@@ -4,6 +4,7 @@ import { videos } from '@abundanz/shared'
 import { db } from '@/utils/db'
 import { eq } from 'drizzle-orm'
 import { getStreamUrl } from '@/utils/video-provider'
+import { isSubscribed } from '@/utils/subscription'
 
 export async function GET(
   request: NextRequest,
@@ -12,8 +13,9 @@ export async function GET(
   const user = await getUserFromRequest(request)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // Phase 2: subscription check deferred — all authenticated users can stream
-  // Phase 3: replace with RevenueCat entitlement check
+  if (!await isSubscribed(user.id)) {
+    return NextResponse.json({ error: 'Subscription required' }, { status: 403 })
+  }
 
   const { id } = await params
   const [video] = await db.select().from(videos).where(eq(videos.id, id))

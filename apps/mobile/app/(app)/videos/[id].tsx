@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native'
-import { useLocalSearchParams, useRouter } from 'expo-router'
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router'
+import { useCallback } from 'react'
 import { useVideoPlayer, VideoView } from 'expo-video'
 import type { Video } from '@abundanz/shared'
 import { api } from '@/utils/api'
@@ -11,6 +12,7 @@ export default function VideoScreen() {
   const [video, setVideo] = useState<Video | null>(null)
   const [streamUrl, setStreamUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [subscribed, setSubscribed] = useState<boolean | null>(null)
 
   const player = useVideoPlayer(null, (p) => {
     p.loop = false
@@ -24,18 +26,51 @@ export default function VideoScreen() {
     return () => sub.remove()
   }, [player])
 
-  useEffect(() => {
-    Promise.all([
-      api.getVideo(id),
-      api.getStreamUrl(id),
-    ])
-      .then(([{ video }, { url }]) => {
-        setVideo(video)
-        setStreamUrl(url)
-        player.replaceAsync({ uri: url, contentType: 'hls' })
-      })
-      .catch((e) => setError(e.message))
-  }, [id])
+  // Re-check subscription each time this screen comes into focus (e.g. returning from paywall)
+  useFocusEffect(
+    useCallback(() => {
+      setSubscribed(null)
+      setError(null)
+
+      api.getSubscription()
+        .then(({ isSubscribed }) => {
+          setSubscribed(isSubscribed)
+          if (!isSubscribed) return
+
+          Promise.all([api.getVideo(id), api.getStreamUrl(id)])
+            .then(([{ video }, { url }]) => {
+              setVideo(video)
+              setStreamUrl(url)
+              player.replaceAsync({ uri: url, contentType: 'hls' })
+            })
+            .catch((e) => setError(e.message))
+        })
+        .catch(() => setSubscribed(false))
+    }, [id])
+  )
+
+  if (subscribed === null) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator color="#fff" />
+      </View>
+    )
+  }
+
+  if (!subscribed) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.lockTitle}>Subscribe to watch</Text>
+        <Text style={styles.lockSub}>Get unlimited access to all content.</Text>
+        <TouchableOpacity style={styles.button} onPress={() => router.push('/(app)/paywall')}>
+          <Text style={styles.buttonText}>See plans</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backLink}>
+          <Text style={styles.backLinkText}>← Back</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
 
   if (error) {
     return (
@@ -92,7 +127,7 @@ export default function VideoScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   content: { paddingBottom: 40 },
-  centered: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center', gap: 16 },
+  centered: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center', gap: 12, paddingHorizontal: 32 },
   backButton: { paddingHorizontal: 16, paddingTop: 60, paddingBottom: 12 },
   backText: { color: '#a1a1aa', fontSize: 15 },
   player: { width: '100%', aspectRatio: 16 / 9 },
@@ -101,5 +136,17 @@ const styles = StyleSheet.create({
   tags: { flexDirection: 'row', gap: 8, marginBottom: 12 },
   tag: { color: '#71717a', fontSize: 13 },
   description: { color: '#a1a1aa', fontSize: 14, lineHeight: 22 },
-  errorText: { color: '#f87171', fontSize: 14 },
+  errorText: { color: '#f87171', fontSize: 14, textAlign: 'center' },
+  lockTitle: { color: '#fff', fontSize: 22, fontWeight: 'bold', textAlign: 'center' },
+  lockSub: { color: '#71717a', fontSize: 14, textAlign: 'center' },
+  button: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    marginTop: 8,
+  },
+  buttonText: { color: '#000', fontWeight: '700', fontSize: 15 },
+  backLink: { marginTop: 8 },
+  backLinkText: { color: '#52525b', fontSize: 14 },
 })
