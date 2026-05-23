@@ -25,3 +25,6 @@ apps/mobile/dist/
 .DS_Store
 *.pem
 *.tsbuildinfo
+
+# Supabase local snippets (may contain video IDs, CDN URLs, seed data)
+supabase/snippets/

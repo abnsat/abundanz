@@ -1,44 +1,105 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { useEffect, useState } from 'react'
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native'
+import { useRouter, type Href } from 'expo-router'
+import type { Video } from '@abundanz/shared'
+import { api } from '@/utils/api'
 import { supabase } from '@/utils/supabase'
 
 export default function HomeScreen() {
+  const [videos, setVideos] = useState<Video[]>([])
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+
+  useEffect(() => {
+    api.getVideos()
+      .then(({ videos }) => setVideos(videos))
+      .catch(console.error)
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator color="#fff" />
+      </View>
+    )
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Abundanz</Text>
-      <Text style={styles.subtitle}>Videos coming in Phase 2.</Text>
+      <View style={styles.header}>
+        <Text style={styles.logo}>Abundanz</Text>
+        <TouchableOpacity onPress={() => supabase.auth.signOut()}>
+          <Text style={styles.signOut}>Sign out</Text>
+        </TouchableOpacity>
+      </View>
 
-      <TouchableOpacity
-        style={styles.signOutButton}
-        onPress={() => supabase.auth.signOut()}
-      >
-        <Text style={styles.signOutText}>Sign Out</Text>
-      </TouchableOpacity>
+      {videos.length === 0 ? (
+        <View style={styles.centered}>
+          <Text style={styles.empty}>No videos yet.</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={videos}
+          keyExtractor={(v) => v.id}
+          numColumns={2}
+          columnWrapperStyle={styles.row}
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => router.push(`/(app)/videos/${item.id}` as Href)}
+            >
+              <View style={styles.thumbnail}>
+                {item.thumbnailUrl ? (
+                  <Image source={{ uri: item.thumbnailUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+                ) : (
+                  <Text style={styles.playIcon}>▶</Text>
+                )}
+              </View>
+              <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      )}
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-    paddingHorizontal: 24,
-    paddingTop: 80,
+  container: { flex: 1, backgroundColor: '#000' },
+  centered: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 60,
+    paddingBottom: 16,
   },
-  title: {
-    color: '#fff',
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 8,
+  logo: { color: '#fff', fontSize: 22, fontWeight: 'bold' },
+  signOut: { color: '#71717a', fontSize: 14 },
+  list: { padding: 12 },
+  row: { gap: 8 },
+  card: { flex: 1, marginBottom: 12 },
+  thumbnail: {
+    aspectRatio: 16 / 9,
+    backgroundColor: '#27272a',
+    borderRadius: 6,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 6,
   },
-  subtitle: {
-    color: '#71717a',
-    fontSize: 16,
-  },
-  signOutButton: {
-    marginTop: 40,
-  },
-  signOutText: {
-    color: '#71717a',
-    fontSize: 14,
-  },
+  playIcon: { color: '#52525b', fontSize: 24 },
+  title: { color: '#e4e4e7', fontSize: 12, lineHeight: 16 },
+  empty: { color: '#71717a', fontSize: 14 },
 })
