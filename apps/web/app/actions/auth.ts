@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { createClient as createBaseClient } from '@supabase/supabase-js'
 
 export async function signInWithGoogle() {
   const supabase = await createClient()
@@ -28,15 +29,17 @@ export async function signInWithEmail(formData: FormData) {
 }
 
 export async function signUpWithEmail(formData: FormData) {
-  const supabase = await createClient()
+  // Implicit flow so Supabase generates a plain token hash (not pkce_-prefixed).
+  // PKCE tokens require the originating device's verifier, breaking cross-device confirmation.
+  const supabase = createBaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { flowType: 'implicit', persistSession: false } }
+  )
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` },
-  })
+  const { error } = await supabase.auth.signUp({ email, password })
 
   if (error) redirect(`/login?error=${encodeURIComponent(error.message)}`)
   redirect('/login?message=Check your email to confirm your account')
