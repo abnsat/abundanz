@@ -3,8 +3,10 @@ import { db } from '@/utils/db'
 import { subscriptions } from '@abundanz/shared'
 
 export async function POST(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.REVENUECAT_SECRET_KEY}`) {
+  const authHeader = request.headers.get('authorization') ?? ''
+  const provided = authHeader.replace(/^Bearer\s+/i, '').trim()
+  const expected = process.env.REVENUECAT_SECRET_KEY
+  if (!expected || provided !== expected) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
