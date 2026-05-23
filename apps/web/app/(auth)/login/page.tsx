@@ -1,4 +1,4 @@
-import { signInWithEmail, signInWithGoogle, signUpWithEmail } from '@/app/actions/auth'
+import { signInWithEmail, signUpWithEmail } from '@/app/actions/auth'
 
 interface Props {
   searchParams: Promise<{ error?: string; message?: string }>
@@ -63,15 +63,13 @@ export default async function LoginPage({ searchParams }: Props) {
           </div>
         </div>
 
-        <form action={signInWithGoogle}>
-          <button
-            type="submit"
-            className="w-full border border-zinc-600 text-white py-3 rounded hover:bg-zinc-900 transition-colors flex items-center justify-center gap-3"
-          >
-            <GoogleIcon />
-            Continue with Google
-          </button>
-        </form>
+        <a
+          href="/api/auth/google"
+          className="w-full border border-zinc-600 text-white py-3 rounded hover:bg-zinc-900 transition-colors flex items-center justify-center gap-3"
+        >
+          <GoogleIcon />
+          Continue with Google
+        </a>
       </div>
     </div>
   )
