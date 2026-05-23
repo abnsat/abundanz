@@ -1,11 +1,24 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
+import type { EmailOtpType } from '@supabase/supabase-js'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
+  const token_hash = searchParams.get('token_hash')
+  const type = searchParams.get('type') as EmailOtpType | null
   const next = searchParams.get('next') ?? '/dashboard'
 
+  // Email confirmation, magic link, password reset — works cross-device
+  if (token_hash && type) {
+    const supabase = await createClient()
+    const { error } = await supabase.auth.verifyOtp({ token_hash, type })
+    if (!error) return NextResponse.redirect(`${origin}${next}`)
+    console.error('[auth/callback] verifyOtp error:', error)
+    return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(error.message)}`)
+  }
+
+  // OAuth PKCE flow (Google etc.)
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
@@ -14,5 +27,5 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(error.message)}`)
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed_no_code`)
+  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`)
 }

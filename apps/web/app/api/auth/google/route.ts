@@ -18,7 +18,7 @@ export async function GET(request: Request) {
               return { name: name.trim(), value: rest.join('=') }
             })
         },
-        setAll(cookies) {
+        setAll(cookies: Array<{ name: string; value: string; options?: CookieOptions }>) {
           cookiesToSet.push(...cookies)
         },
       },
