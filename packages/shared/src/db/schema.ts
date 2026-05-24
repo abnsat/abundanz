@@ -22,6 +22,7 @@ export const videos = pgTable('videos', {
   thumbnailUrl: text('thumbnail_url'),
   previewUrl: text('preview_url'),
   durationSeconds: integer('duration_seconds'),
+  status: text('status').default('ready').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 })
 

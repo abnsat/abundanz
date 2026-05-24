@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { isSubscribed } from '@/utils/subscription'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { Navbar } from '@/app/components/Navbar'
 import { CheckoutButton } from './CheckoutButton'
 
 const FEATURES = [
@@ -15,28 +16,13 @@ export default async function PricingPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (user && await isSubscribed(user.id)) redirect('/dashboard')
+  if (user && await isSubscribed(user.id)) redirect('/')
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-5">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="rounded-xl overflow-hidden" style={{ width: 36, height: 22 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.jpeg" alt="AbundanZ" style={{ width: 36, height: 'auto', display: 'block' }} />
-          </div>
-          <span className="text-white font-bold tracking-tight">AbundanZ</span>
-        </Link>
-        {user && (
-          <Link href="/dashboard" className="text-sm text-zinc-500 hover:text-white transition-colors">
-            ← Back to app
-          </Link>
-        )}
-      </nav>
+      <Navbar />
 
-      {/* Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-16">
+      <main className="flex-1 flex flex-col items-center justify-center px-6 pt-24 pb-16">
         <p className="text-zinc-600 text-xs font-semibold tracking-widest uppercase mb-4">
           Subscription
         </p>

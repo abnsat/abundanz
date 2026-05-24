@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { videos } from '@abundanz/shared'
 import { db } from '@/utils/db'
-import { desc } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Video } from '@abundanz/shared'
@@ -26,7 +26,7 @@ export default async function CatalogPage({ searchParams }: Props) {
   const { data: { user } } = await supabase.auth.getUser()
 
   const { category: activeCategory } = await searchParams
-  const allVideos = await db.select().from(videos).orderBy(desc(videos.createdAt))
+  const allVideos = await db.select().from(videos).where(eq(videos.status, 'ready')).orderBy(desc(videos.createdAt))
 
   const byCategory = allVideos.reduce<Record<string, Video[]>>((acc, v) => {
     const cat = v.category ?? 'Other'
@@ -129,7 +129,7 @@ export default async function CatalogPage({ searchParams }: Props) {
             </h2>
 
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 sm:gap-5">
-              {(categoryVideos ?? []).filter(v => v.id !== featured?.id).map((video) => (
+              {(categoryVideos ?? []).map((video) => (
                 <Link
                   key={video.id}
                   href={user ? `/videos/${video.id}` : '/login'}

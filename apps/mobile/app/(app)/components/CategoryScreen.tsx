@@ -113,7 +113,7 @@ export function CategoryScreen({ category }: Props) {
   return (
     <View style={styles.container}>
       <FlatList
-        data={videos.slice(1)}
+        data={videos}
         keyExtractor={(v) => v.id}
         numColumns={2}
         showsVerticalScrollIndicator={false}

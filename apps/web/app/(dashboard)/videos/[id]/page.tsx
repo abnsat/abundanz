@@ -42,7 +42,7 @@ export default async function VideoPage({ params }: Props) {
       <main className="pt-20 max-w-5xl mx-auto px-6 pb-16">
         {/* Back */}
         <Link
-          href="/dashboard"
+          href="/"
           className="inline-flex items-center gap-2 text-zinc-500 hover:text-white text-sm mb-6 transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
