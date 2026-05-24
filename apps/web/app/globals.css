@@ -15,9 +15,11 @@
   --color-accent-fg: var(--color-accent-fg);
 }
 
+html,
 body {
   background: #000;
   color: #fff;
+  overflow-x: hidden;
 }
 
 /* ─── Utility: hide scrollbar while keeping scroll behaviour ────────────────── */

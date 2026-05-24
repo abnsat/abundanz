@@ -10,6 +10,7 @@ import {
   Dimensions,
   SafeAreaView,
 } from 'react-native'
+import { Image as ExpoImage } from 'expo-image'
 import { useRouter, type Href } from 'expo-router'
 import type { Video } from '@abundanz/shared'
 import { api } from '@/utils/api'
@@ -52,8 +53,13 @@ export function CategoryScreen({ category }: Props) {
   const hero = (
     <View style={styles.heroWrapper}>
       <View style={styles.hero}>
-        {featured?.thumbnailUrl ? (
-          <Image source={{ uri: featured.thumbnailUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+        {(featured?.previewUrl ?? featured?.thumbnailUrl) ? (
+          <ExpoImage
+            source={{ uri: featured.previewUrl ?? featured.thumbnailUrl ?? undefined }}
+            style={StyleSheet.absoluteFill}
+            contentFit="cover"
+            autoplay
+          />
         ) : (
           <View style={[StyleSheet.absoluteFill, { backgroundColor: '#111' }]} />
         )}

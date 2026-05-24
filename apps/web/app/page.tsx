@@ -53,20 +53,26 @@ export default async function CatalogPage({ searchParams }: Props) {
 
       {/* ── Hero ────────────────────────────────────────────────── */}
       {featured && (
-        <div className="relative h-[75vh] sm:h-screen overflow-hidden">
-          {featured.thumbnailUrl && (
+        <div className="relative h-[55vh] sm:h-screen overflow-hidden">
+          {featured.previewUrl ? (
+            <img
+              src={featured.previewUrl}
+              alt={featured.title}
+              className="absolute inset-0 w-full h-full object-cover object-center"
+            />
+          ) : featured.thumbnailUrl ? (
             <Image
               src={featured.thumbnailUrl}
               alt={featured.title}
               fill
-              className="object-cover object-top"
+              className="object-cover object-center"
               priority
             />
-          )}
+          ) : null}
           <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/30 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
 
-          <div className="absolute bottom-0 left-0 px-6 pb-10 sm:px-12 sm:pb-20 max-w-2xl">
+          <div className="absolute bottom-0 left-0 right-0 px-6 pb-10 sm:px-12 sm:pb-20 sm:max-w-2xl sm:right-auto">
             <span className="inline-block text-[10px] font-bold tracking-[0.25em] uppercase border border-white/40 text-white/80 px-2.5 py-1 rounded-sm mb-3 sm:mb-5">
               New Release
             </span>
@@ -111,7 +117,7 @@ export default async function CatalogPage({ searchParams }: Props) {
       )}
 
       {/* ── Category rows ───────────────────────────────────────── */}
-      <div className="bg-black px-8 pt-12 pb-20 space-y-12">
+      <div className="bg-black px-4 sm:px-8 pt-12 pb-20 space-y-12">
         {allVideos.length === 0 && (
           <p className="text-zinc-600 text-sm">No videos yet.</p>
         )}
@@ -122,12 +128,12 @@ export default async function CatalogPage({ searchParams }: Props) {
               {category}
             </h2>
 
-            <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 sm:gap-5">
               {(categoryVideos ?? []).filter(v => v.id !== featured?.id).map((video) => (
                 <Link
                   key={video.id}
                   href={user ? `/videos/${video.id}` : '/login'}
-                  className="group shrink-0 w-44"
+                  className="group"
                 >
                   <div className="aspect-[2/3] bg-zinc-900 rounded-lg overflow-hidden relative mb-3">
                     {video.thumbnailUrl ? (

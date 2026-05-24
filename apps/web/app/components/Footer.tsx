@@ -13,8 +13,8 @@ const LINKS = [
 
 export function Footer() {
   return (
-    <footer className="bg-black border-t border-zinc-900 px-6 sm:px-12 py-10">
-      <div className="max-w-6xl mx-auto flex flex-col items-center gap-6">
+    <footer className="bg-black border-t border-zinc-900 px-4 sm:px-12 py-10">
+      <div className="max-w-6xl mx-auto flex flex-col items-center gap-5">
 
         {/* Logo */}
         <div className="overflow-hidden" style={{ width: 60, height: 38 }}>
@@ -23,7 +23,7 @@ export function Footer() {
         </div>
 
         {/* Links */}
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-3 max-w-xs sm:max-w-none">
           {LINKS.map(({ label, href }) => (
             <Link key={label} href={href} className="text-xs text-zinc-500 hover:text-white transition-colors">
               {label}
@@ -32,7 +32,7 @@ export function Footer() {
         </div>
 
         {/* Copyright */}
-        <p className="text-xs text-zinc-700">
+        <p className="text-xs text-zinc-700 text-center">
           © {new Date().getFullYear()} AbundanZ · Christian Media
         </p>
 
