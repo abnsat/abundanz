@@ -3,7 +3,7 @@ import { getUserFromRequest } from '@/utils/supabase/api-auth'
 import { videos } from '@abundanz/shared'
 import { db } from '@/utils/db'
 import { eq } from 'drizzle-orm'
-import { getSignedStreamUrl } from '@/utils/video-provider'
+import { getStreamUrl } from '@/utils/video-provider'
 import { isSubscribed } from '@/utils/subscription'
 
 export async function GET(
@@ -21,6 +21,6 @@ export async function GET(
   const [video] = await db.select().from(videos).where(eq(videos.id, id))
   if (!video) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const url = getSignedStreamUrl(video.bunnyVideoId)
+  const url = getStreamUrl(video.bunnyVideoId)
   return NextResponse.json({ url })
 }

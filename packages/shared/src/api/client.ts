@@ -24,12 +24,12 @@ export function createApiClient(baseUrl: string, getToken: () => Promise<string 
       request<{ url: string }>(`/api/stream/${videoId}`),
 
     getVideos: (category?: string) =>
-      request<{ videos: import('../types').Video[] }>(
+      request<{ videos: import('../types').PublicVideo[] }>(
         `/api/videos${category ? `?category=${category}` : ''}`
       ),
 
     getVideo: (videoId: string) =>
-      request<{ video: import('../types').Video }>(`/api/videos/${videoId}`),
+      request<{ video: import('../types').PublicVideo }>(`/api/videos/${videoId}`),
 
     getSubscription: () =>
       request<{ isSubscribed: boolean }>('/api/subscription'),

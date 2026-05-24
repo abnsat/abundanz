@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { timingSafeEqual } from 'crypto'
 import { db } from '@/utils/db'
 import { subscriptions } from '@abundanz/shared'
 
 export async function POST(request: NextRequest) {
-  const authHeader = request.headers.get('authorization') ?? ''
-  const provided = authHeader.replace(/^Bearer\s+/i, '').trim()
-  const expected = process.env.REVENUECAT_SECRET_KEY
-  if (!expected || provided !== expected) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const secret = process.env.REVENUECAT_WEBHOOK_SECRET
+  if (!secret) return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
+
+  const provided = (request.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '').trim()
+  const provBuf = Buffer.from(provided)
+  const expBuf = Buffer.from(secret)
+  const valid = provBuf.length === expBuf.length && timingSafeEqual(provBuf, expBuf)
+  if (!valid) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json()
   const event = body.event
