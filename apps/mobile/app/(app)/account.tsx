@@ -70,7 +70,7 @@ export default function AccountScreen() {
   }
 
   const name = [account?.firstName, account?.lastName].filter(Boolean).join(' ')
-  const subscribed = isSubscribed ?? account?.isSubscribed ?? false
+  const subscribed = account?.isSubscribed ?? isSubscribed ?? false
 
   return (
     <SafeAreaView style={styles.container}>

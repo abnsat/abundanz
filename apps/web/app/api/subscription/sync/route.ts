@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     })
     .onConflictDoUpdate({
       target: subscriptions.userId,
-      set: { isActive: true, expiresAt, updatedAt: new Date() },
+      set: { isActive: true, source: 'apple', expiresAt, updatedAt: new Date() },
     })
 
   return NextResponse.json({ isSubscribed: true })
