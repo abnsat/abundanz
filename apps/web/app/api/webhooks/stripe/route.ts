@@ -4,14 +4,11 @@ import { db } from '@/utils/db'
 import { subscriptions } from '@abundanz/shared'
 import type Stripe from 'stripe'
 
-async function getPeriodEnd(subscription: Stripe.Subscription): Promise<Date | null> {
-  // Fetch period_end from the latest invoice since current_period_end was removed in dahlia API
-  if (!subscription.latest_invoice) return null
-  const invoiceId = typeof subscription.latest_invoice === 'string'
-    ? subscription.latest_invoice
-    : subscription.latest_invoice.id
-  const invoice = await stripe.invoices.retrieve(invoiceId)
-  return invoice.period_end ? new Date(invoice.period_end * 1000) : null
+function getPeriodEnd(subscription: Stripe.Subscription): Date | null {
+  // current_period_end moved to subscription item level in the dahlia API
+  const item = subscription.items?.data?.[0]
+  if (item?.current_period_end) return new Date(item.current_period_end * 1000)
+  return null
 }
 
 export async function POST(request: NextRequest) {

@@ -9,14 +9,8 @@ async function checkAndSyncStripe(userId: string, stripeSubscriptionId: string):
     const active = sub.status === 'active' || sub.status === 'trialing'
 
     // Fetch the current period end from the latest invoice
-    let expiresAt: Date | null = null
-    if (sub.latest_invoice) {
-      const invoiceId = typeof sub.latest_invoice === 'string'
-        ? sub.latest_invoice
-        : sub.latest_invoice.id
-      const invoice = await stripe.invoices.retrieve(invoiceId)
-      expiresAt = invoice.period_end ? new Date(invoice.period_end * 1000) : null
-    }
+    const item = sub.items?.data?.[0]
+    const expiresAt = item?.current_period_end ? new Date(item.current_period_end * 1000) : null
 
     // Sync the fresh data back to DB so next request hits the fast path
     await db

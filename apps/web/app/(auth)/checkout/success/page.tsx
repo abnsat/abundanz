@@ -16,12 +16,8 @@ async function syncFromSession(sessionId: string) {
     if (!userId) return
 
     const sub = await stripe.subscriptions.retrieve(session.subscription as string)
-    const invoiceId = typeof sub.latest_invoice === 'string'
-      ? sub.latest_invoice
-      : sub.latest_invoice?.id
-    const expiresAt = invoiceId
-      ? await stripe.invoices.retrieve(invoiceId).then(inv => inv.period_end ? new Date(inv.period_end * 1000) : null)
-      : null
+    const item = sub.items?.data?.[0]
+    const expiresAt = item?.current_period_end ? new Date(item.current_period_end * 1000) : null
 
     await db
       .insert(subscriptions)
