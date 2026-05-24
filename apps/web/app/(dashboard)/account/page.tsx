@@ -2,10 +2,10 @@ import { createClient } from '@/utils/supabase/server'
 import { db } from '@/utils/db'
 import { subscriptions } from '@abundanz/shared'
 import { eq } from 'drizzle-orm'
-import { signOut } from '@/app/actions/auth'
 import { isSubscribed } from '@/utils/subscription'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { Navbar } from '@/app/components/Navbar'
 import { CancelButton } from './CancelButton'
 
 export default async function AccountPage() {
@@ -26,26 +26,18 @@ export default async function AccountPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <header className="flex items-center justify-between px-8 py-4 border-b border-zinc-800/60">
-        <Link href="/" className="overflow-hidden shrink-0" style={{ width: 80, height: 50 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.jpeg" alt="AbundanZ" style={{ width: 80, height: 'auto', display: 'block' }} />
-        </Link>
-        <form action={signOut}>
-          <button
-            type="submit"
-            className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-white px-3 py-1.5 rounded-full border border-transparent hover:border-zinc-700 transition-colors"
-          >
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-              <path d="M5 7h7M9.5 4.5L12 7l-2.5 2.5"/>
-              <path d="M8 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h5"/>
-            </svg>
-            Sign out
-          </button>
-        </form>
-      </header>
+      <Navbar />
 
-      <main className="max-w-lg mx-auto px-6 py-12">
+      <main className="max-w-lg mx-auto px-6 pt-28 pb-16">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-zinc-500 hover:text-white text-sm mb-8 transition-colors"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Back
+        </Link>
         {/* Profile header */}
         <div className="flex items-center gap-4 mb-10">
           <div className="w-14 h-14 rounded-full bg-zinc-800 flex items-center justify-center shrink-0">

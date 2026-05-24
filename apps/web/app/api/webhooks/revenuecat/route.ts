@@ -19,7 +19,13 @@ export async function POST(request: NextRequest) {
 
   const activeTypes = ['INITIAL_PURCHASE', 'RENEWAL', 'PRODUCT_CHANGE', 'UNCANCELLATION']
   const inactiveTypes = ['CANCELLATION', 'EXPIRATION', 'BILLING_ISSUE']
-  const source = event.store === 'APP_STORE' ? 'apple' : 'google'
+  const storeSourceMap: Record<string, 'apple' | 'google' | 'stripe'> = {
+    APP_STORE: 'apple',
+    PLAY_STORE: 'google',
+    STRIPE: 'stripe',
+    RC_BILLING: 'stripe',
+  }
+  const source = storeSourceMap[event.store as string] ?? 'apple'
 
   try {
     if (activeTypes.includes(event.type)) {

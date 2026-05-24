@@ -36,6 +36,17 @@ export function createApiClient(baseUrl: string, getToken: () => Promise<string 
 
     syncSubscription: () =>
       request<{ isSubscribed: boolean }>('/api/subscription/sync', { method: 'POST' }),
+
+    getAccount: () =>
+      request<{
+        email: string
+        firstName: string | null
+        lastName: string | null
+        isSubscribed: boolean
+        source: 'stripe' | 'apple' | 'google' | null
+        expiresAt: string | null
+        cancelAtPeriodEnd: boolean
+      }>('/api/account'),
   }
 }
 
