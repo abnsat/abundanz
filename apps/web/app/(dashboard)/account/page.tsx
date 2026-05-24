@@ -77,6 +77,16 @@ export default async function AccountPage() {
                 {sub?.cancelAtPeriodEnd && (
                   <p className="text-xs text-zinc-500">Cancellation scheduled — access until expiry date above.</p>
                 )}
+                {sub?.source === 'apple' && !sub?.stripeSubscriptionId && (
+                  <p className="text-xs text-zinc-500">
+                    Subscribed via Apple. To cancel, open <strong className="text-zinc-400">Settings → Apple ID → Subscriptions</strong> on your device.
+                  </p>
+                )}
+                {sub?.source === 'google' && !sub?.stripeSubscriptionId && (
+                  <p className="text-xs text-zinc-500">
+                    Subscribed via Google. To cancel, open <strong className="text-zinc-400">Play Store → Subscriptions</strong> on your device.
+                  </p>
+                )}
               </div>
             ) : (
               <div className="space-y-4">

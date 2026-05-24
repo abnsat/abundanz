@@ -39,6 +39,9 @@ importers:
       expo-router:
         specifier: ~4.0.21
         version: 4.0.22(patch_hash=w6smjrigxjdauurfkkr2wp3v34)(expo-constants@17.0.8)(expo-linking@7.0.5)(expo@54.0.34)(react-dom@18.3.1)(react-native-safe-area-context@5.8.0)(react-native-screens@4.25.1)(react-native@0.81.5)(react@19.1.0)
+      expo-splash-screen:
+        specifier: ~31.0.13
+        version: 31.0.13(expo@54.0.34)(typescript@5.9.3)
       expo-status-bar:
         specifier: ~3.0.9
         version: 3.0.9(react-native@0.81.5)(react@19.1.0)
@@ -5863,6 +5866,18 @@ packages:
   /expo-server@1.0.6:
     resolution: {integrity: sha512-vb5TBtskvEdzYuW79lATXutOEBfW5m6U4EFpNjCVZTnI7S//SAsLQkYEpn+EDfn84m6VQfzSGkIVR6YPaScKFA==}
     engines: {node: '>=20.16.0'}
+    dev: false
+
+  /expo-splash-screen@31.0.13(expo@54.0.34)(typescript@5.9.3):
+    resolution: {integrity: sha512-1epJLC1cDlwwj089R2h8cxaU5uk4ONVAC+vzGiTZH4YARQhL4Stlz1MbR6yAS173GMosvkE6CAeihR7oIbCkDA==}
+    peerDependencies:
+      expo: '*'
+    dependencies:
+      '@expo/prebuild-config': 54.0.8(expo@54.0.34)(typescript@5.9.3)
+      expo: 54.0.34(@babel/core@7.29.0)(expo-router@4.0.22)(react-native@0.81.5)(react@19.1.0)(typescript@5.9.3)
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
     dev: false
 
   /expo-status-bar@3.0.9(react-native@0.81.5)(react@19.1.0):

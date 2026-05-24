@@ -50,22 +50,27 @@ export function CategoryScreen({ category }: Props) {
   }
 
   const hero = (
-    <View style={styles.hero}>
-      {featured?.thumbnailUrl ? (
-        <Image source={{ uri: featured.thumbnailUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" />
-      ) : (
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: '#111' }]} />
-      )}
-      <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.35)' }]} />
-      <SafeAreaView />
-      {featured && (
-        <TouchableOpacity style={styles.heroMeta} onPress={() => handleVideoPress(featured.id)} activeOpacity={0.85}>
-          <Text style={styles.heroTitle} numberOfLines={3}>{featured.title}</Text>
-          <View style={styles.heroButton}>
-            <Text style={styles.heroButtonText}>▶  Watch</Text>
-          </View>
-        </TouchableOpacity>
-      )}
+    <View style={styles.heroWrapper}>
+      <View style={styles.hero}>
+        {featured?.thumbnailUrl ? (
+          <Image source={{ uri: featured.thumbnailUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+        ) : (
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: '#111' }]} />
+        )}
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.45)' }]} />
+        <SafeAreaView />
+        {featured && (
+          <TouchableOpacity style={styles.heroMeta} onPress={() => handleVideoPress(featured.id)} activeOpacity={0.85}>
+            <View style={styles.newReleaseBadge}>
+              <Text style={styles.newReleaseText}>NEW RELEASE</Text>
+            </View>
+            <Text style={styles.heroTitle} numberOfLines={3}>{featured.title}</Text>
+            <View style={styles.heroButton}>
+              <Text style={styles.heroButtonText}>▶  Watch</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   )
 
@@ -139,11 +144,27 @@ export function CategoryScreen({ category }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
+  heroWrapper: { marginBottom: 24 },
   hero: {
     width: SCREEN_WIDTH,
     height: HERO_HEIGHT,
     backgroundColor: '#18181b',
     overflow: 'hidden',
+  },
+  newReleaseBadge: {
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 2,
+    marginBottom: 10,
+  },
+  newReleaseText: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 3,
   },
   heroMeta: {
     position: 'absolute',
@@ -152,7 +173,6 @@ const styles = StyleSheet.create({
     right: 0,
     padding: 24,
     paddingBottom: 28,
-    backgroundColor: 'rgba(0,0,0,0.65)',
   },
   heroTitle: {
     color: '#fff',
@@ -160,6 +180,9 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     lineHeight: 30,
     marginBottom: 16,
+    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 6,
   },
   heroButton: {
     backgroundColor: '#fff',
@@ -170,8 +193,8 @@ const styles = StyleSheet.create({
   },
   heroButtonText: { color: '#000', fontWeight: '700', fontSize: 14 },
   centered: { paddingVertical: 40, alignItems: 'center', paddingHorizontal: 32 },
-  grid: { backgroundColor: '#000', paddingHorizontal: GRID_PADDING, paddingTop: 20 },
-  gridRow: { justifyContent: 'space-between', marginBottom: GRID_GAP },
+  grid: { backgroundColor: '#000' },
+  gridRow: { justifyContent: 'space-between', marginBottom: GRID_GAP, paddingHorizontal: GRID_PADDING },
   card: { width: CARD_WIDTH },
   cardThumb: {
     width: CARD_WIDTH,

@@ -12,7 +12,7 @@ type AccountData = Awaited<ReturnType<typeof api.getAccount>>
 const MANAGE_URLS: Record<string, string> = {
   apple: 'https://apps.apple.com/account/subscriptions',
   google: 'https://play.google.com/store/account/subscriptions',
-  stripe: 'https://abundanz.com/account',
+  stripe: 'https://abundanz.ai/account',
 }
 
 function formatDate(iso: string) {
@@ -47,7 +47,7 @@ export default function AccountScreen() {
   function manageSubscription() {
     const url = (account?.source && MANAGE_URLS[account.source]) ?? MANAGE_URLS.apple
     Linking.openURL(url).catch(() => {
-      Alert.alert('Could not open', 'Visit abundanz.com/account to manage your subscription.')
+      Alert.alert('Could not open', 'Visit abundanz.ai/account to manage your subscription.')
     })
   }
 
@@ -137,14 +137,25 @@ export default function AccountScreen() {
         </View>
 
         {/* Actions */}
-        {subscribed && (
+        {subscribed && account?.source === 'stripe' ? (
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>Manage Subscription</Text>
+            <Text style={styles.manageNote}>
+              Your subscription is billed via the web. Visit{' '}
+              <Text style={styles.manageLink} onPress={manageSubscription}>abundanz.ai/account</Text>
+              {' '}to cancel or update billing.
+            </Text>
+          </View>
+        ) : subscribed && (account?.source === 'apple' || account?.source === 'google') ? (
           <View style={styles.section}>
             <TouchableOpacity style={styles.row} onPress={manageSubscription} activeOpacity={0.7}>
-              <Text style={styles.rowText}>Manage Subscription</Text>
+              <Text style={styles.rowText}>
+                {account.source === 'apple' ? 'Manage in App Store' : 'Manage in Play Store'}
+              </Text>
               <Text style={styles.chevron}>›</Text>
             </TouchableOpacity>
           </View>
-        )}
+        ) : null}
 
         <View style={styles.section}>
           <TouchableOpacity style={styles.row} onPress={signOut} activeOpacity={0.7}>
@@ -197,6 +208,8 @@ const styles = StyleSheet.create({
   sourceText: { color: '#71717a', fontSize: 11, fontWeight: '600', textTransform: 'capitalize' },
   renewalText: { color: '#71717a', fontSize: 13 },
   cancelNote: { color: '#52525b', fontSize: 12, lineHeight: 18 },
+  manageNote: { color: '#71717a', fontSize: 13, lineHeight: 20 },
+  manageLink: { color: '#a1a1aa', textDecorationLine: 'underline' },
 
   section: {
     backgroundColor: '#18181b',
