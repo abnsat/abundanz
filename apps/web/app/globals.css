@@ -1,26 +1,30 @@
 @import "tailwindcss";
 
+/* ─── Brand tokens ─────────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Accent: swap this one variable to recolour every CTA on the site.
+     e.g. #e50914 (Netflix red), #c9a84c (gold), #3b82f6 (blue)          */
+  --color-accent: #ffffff;
+  --color-accent-fg: #000000; /* foreground on top of accent */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-accent: var(--color-accent);
+  --color-accent-fg: var(--color-accent-fg);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #000;
+  color: #fff;
+}
+
+/* ─── Utility: hide scrollbar while keeping scroll behaviour ────────────────── */
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }

@@ -6,6 +6,15 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { VideoPlayer } from '@/app/components/VideoPlayer'
 import { isSubscribed } from '@/utils/subscription'
+import { Navbar } from '@/app/components/Navbar'
+
+function formatDuration(seconds: number): string {
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = seconds % 60
+  if (h > 0) return `${h}h ${m}m`
+  return `${m}:${String(s).padStart(2, '0')}`
+}
 
 interface Props {
   params: Promise<{ id: string }>
@@ -21,32 +30,46 @@ export default async function VideoPage({ params }: Props) {
   const [video] = await db.select().from(videos).where(eq(videos.id, id))
   if (!video) notFound()
 
-  const minutes = video.durationSeconds ? Math.floor(video.durationSeconds / 60) : null
-  const seconds = video.durationSeconds ? video.durationSeconds % 60 : null
-  const duration = minutes !== null && seconds !== null
-    ? `${minutes}:${String(seconds).padStart(2, '0')}`
-    : null
-
   return (
     <div className="min-h-screen bg-black text-white">
-      <header className="flex items-center justify-between px-8 py-4 border-b border-zinc-800">
-        <Link href="/dashboard" className="text-xl font-bold tracking-tight hover:text-zinc-300 transition-colors">
-          Abundanz
+      <Navbar />
+
+      <main className="pt-20 max-w-5xl mx-auto px-6 pb-16">
+        {/* Back */}
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 text-zinc-500 hover:text-white text-sm mb-6 transition-colors"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Back
         </Link>
-        <span className="text-zinc-400 text-sm">{user.email}</span>
-      </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-8">
-        <VideoPlayer videoId={id} />
+        {/* Player */}
+        <div className="rounded-xl overflow-hidden bg-zinc-950 mb-8">
+          <VideoPlayer videoId={id} />
+        </div>
 
-        <div className="mt-6">
-          <h1 className="text-2xl font-bold mb-2">{video.title}</h1>
-          <div className="flex items-center gap-3 text-sm text-zinc-400 mb-4">
-            {video.category && <span>{video.category}</span>}
-            {duration && <span>{duration}</span>}
+        {/* Metadata */}
+        <div className="max-w-3xl">
+          <h1 className="text-3xl font-bold mb-3 leading-tight">{video.title}</h1>
+
+          <div className="flex flex-wrap items-center gap-3 mb-5">
+            {video.category && (
+              <span className="text-[11px] font-semibold tracking-widest uppercase text-zinc-500 border border-zinc-800 px-2.5 py-1 rounded-sm">
+                {video.category}
+              </span>
+            )}
+            {video.durationSeconds && (
+              <span className="text-sm text-zinc-500">
+                {formatDuration(video.durationSeconds)}
+              </span>
+            )}
           </div>
+
           {video.description && (
-            <p className="text-zinc-300 leading-relaxed">{video.description}</p>
+            <p className="text-zinc-400 leading-relaxed text-sm">{video.description}</p>
           )}
         </div>
       </main>

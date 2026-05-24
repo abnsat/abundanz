@@ -5,10 +5,12 @@ import { useCallback } from 'react'
 import { useVideoPlayer, VideoView } from 'expo-video'
 import type { Video } from '@abundanz/shared'
 import { api } from '@/utils/api'
+import { useSession } from '@/utils/session'
 
 export default function VideoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const router = useRouter()
+  const session = useSession()
   const [video, setVideo] = useState<Video | null>(null)
   const [streamUrl, setStreamUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -48,6 +50,21 @@ export default function VideoScreen() {
         .catch(() => setSubscribed(false))
     }, [id])
   )
+
+  if (!session) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.lockTitle}>Sign in to watch</Text>
+        <Text style={styles.lockSub}>Create a free account to get started.</Text>
+        <TouchableOpacity style={styles.button} onPress={() => router.replace('/(auth)/login')}>
+          <Text style={styles.buttonText}>Sign In</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backLink}>
+          <Text style={styles.backLinkText}>← Back</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
 
   if (subscribed === null) {
     return (

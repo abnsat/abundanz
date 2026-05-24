@@ -8,6 +8,8 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Image,
+  ScrollView,
 } from 'react-native'
 import { supabase } from '@/utils/supabase'
 
@@ -15,96 +17,185 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
 
-  async function signInWithEmail() {
+  async function handleSignIn() {
     setLoading(true)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) Alert.alert('Sign in failed', error.message)
     setLoading(false)
   }
 
-  async function signUpWithEmail() {
+  async function handleSignUp() {
     setLoading(true)
     const { error } = await supabase.auth.signUp({ email, password })
     if (error) Alert.alert('Sign up failed', error.message)
-    else Alert.alert('Check your email', 'Confirmation link sent.')
+    else Alert.alert('Check your email', 'A confirmation link has been sent.')
     setLoading(false)
   }
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={styles.root}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <Text style={styles.title}>Abundanz</Text>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Logo */}
+        <View style={styles.logoWrapper}>
+          <Image
+            source={require('../../assets/logo.jpeg')}
+            style={styles.logo}
+            resizeMode="cover"
+          />
+          <Text style={styles.brand}>AbundanZ</Text>
+          <Text style={styles.tagline}>Christian Media</Text>
+        </View>
 
-      <View style={styles.form}>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#71717a"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#71717a"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+        {/* Mode toggle */}
+        <View style={styles.toggle}>
+          <TouchableOpacity
+            style={[styles.toggleBtn, mode === 'signin' && styles.toggleBtnActive]}
+            onPress={() => setMode('signin')}
+          >
+            <Text style={[styles.toggleText, mode === 'signin' && styles.toggleTextActive]}>
+              Sign In
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.toggleBtn, mode === 'signup' && styles.toggleBtnActive]}
+            onPress={() => setMode('signup')}
+          >
+            <Text style={[styles.toggleText, mode === 'signup' && styles.toggleTextActive]}>
+              Create Account
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={signInWithEmail}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>Sign In</Text>
-        </TouchableOpacity>
+        {/* Form */}
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email address"
+            placeholderTextColor="#52525b"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            autoComplete="email"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor="#52525b"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+          />
 
-        <TouchableOpacity
-          style={[styles.buttonOutline, loading && styles.buttonDisabled]}
-          onPress={signUpWithEmail}
-          disabled={loading}
-        >
-          <Text style={styles.buttonOutlineText}>Create Account</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={mode === 'signin' ? handleSignIn : handleSignUp}
+            disabled={loading}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.buttonText}>
+              {loading ? '…' : mode === 'signin' ? 'Sign In' : 'Create Account'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Footer */}
+        <Text style={styles.footer}>
+          Movies · Documentaries · Kids
+        </Text>
+      </ScrollView>
     </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
     backgroundColor: '#000',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
   },
-  title: {
-    color: '#fff',
-    fontSize: 32,
-    fontWeight: 'bold',
+  container: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 28,
+    paddingVertical: 60,
+  },
+  logoWrapper: {
+    alignItems: 'center',
     marginBottom: 40,
   },
+  logo: {
+    width: 80,
+    height: 80,
+    borderRadius: 20,
+    marginBottom: 12,
+  },
+  brand: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: '700',
+    letterSpacing: -0.5,
+    marginBottom: 4,
+  },
+  tagline: {
+    color: '#52525b',
+    fontSize: 13,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+  },
+  toggle: {
+    flexDirection: 'row',
+    backgroundColor: '#18181b',
+    borderRadius: 10,
+    padding: 3,
+    marginBottom: 28,
+    width: '100%',
+  },
+  toggleBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  toggleBtnActive: {
+    backgroundColor: '#27272a',
+  },
+  toggleText: {
+    color: '#52525b',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  toggleTextActive: {
+    color: '#fff',
+  },
   form: {
-    gap: 12,
+    width: '100%',
+    gap: 10,
   },
   input: {
-    backgroundColor: '#27272a',
+    backgroundColor: '#18181b',
+    borderWidth: 1,
+    borderColor: '#27272a',
     color: '#fff',
-    borderRadius: 8,
+    borderRadius: 10,
     paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
+    paddingVertical: 15,
+    fontSize: 15,
   },
   button: {
     backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingVertical: 14,
+    borderRadius: 10,
+    paddingVertical: 15,
     alignItems: 'center',
     marginTop: 4,
   },
@@ -113,19 +204,14 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#000',
-    fontWeight: '600',
-    fontSize: 16,
+    fontWeight: '700',
+    fontSize: 15,
   },
-  buttonOutline: {
-    borderWidth: 1,
-    borderColor: '#3f3f46',
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  buttonOutlineText: {
-    color: '#fff',
-    fontWeight: '500',
-    fontSize: 16,
+  footer: {
+    color: '#3f3f46',
+    fontSize: 11,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginTop: 48,
   },
 })

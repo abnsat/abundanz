@@ -4,6 +4,7 @@ import { Slot, useRouter, useSegments } from 'expo-router'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from '@/utils/supabase'
 import { configurePurchases, loginPurchases, logoutPurchases } from '@/utils/purchases'
+import { SessionContext } from '@/utils/session'
 
 configurePurchases()
 
@@ -29,17 +30,19 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (session === undefined) return
-
+    // Only redirect authenticated users away from the login screen.
+    // Unauthenticated users can browse the catalog — gating happens per-screen.
     const inAuthGroup = segments[0] === '(auth)'
-
-    if (!session && !inAuthGroup) {
-      router.replace('/(auth)/login')
-    } else if (session && inAuthGroup) {
+    if (session && inAuthGroup) {
       router.replace('/(app)')
     }
   }, [session, segments])
 
   if (session === undefined) return null
 
-  return <Slot />
+  return (
+    <SessionContext.Provider value={session}>
+      <Slot />
+    </SessionContext.Provider>
+  )
 }

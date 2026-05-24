@@ -7,6 +7,8 @@ export const subscriptionSourceEnum = pgEnum('subscription_source', ['stripe', '
 export const users = pgTable('users', {
   id: text('id').primaryKey(), // mirrors auth.users.id from Supabase
   email: text('email').notNull(),
+  firstName: text('first_name'),
+  lastName: text('last_name'),
   role: userRoleEnum('role').default('user').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 })
