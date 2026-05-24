@@ -9,7 +9,6 @@ import {
   Linking,
 } from 'react-native'
 import Purchases, { PurchasesPackage } from 'react-native-purchases'
-import { supabase } from '@/utils/supabase'
 import { api } from '@/utils/api'
 import { useRouter } from 'expo-router'
 
@@ -103,9 +102,6 @@ export default function PaywallScreen() {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.signOutButton} onPress={() => supabase.auth.signOut()}>
-        <Text style={styles.signOutText}>Sign out</Text>
-      </TouchableOpacity>
     </View>
   )
 }
@@ -136,6 +132,4 @@ const styles = StyleSheet.create({
   buttonText: { color: '#000', fontWeight: '700', fontSize: 16 },
   restoreButton: { marginBottom: 32 },
   restoreText: { color: '#71717a', fontSize: 14 },
-  signOutButton: {},
-  signOutText: { color: '#52525b', fontSize: 13 },
 })

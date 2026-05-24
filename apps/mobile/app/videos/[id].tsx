@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native'
+import { useEffect, useState, useCallback } from 'react'
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Image, FlatList, useWindowDimensions } from 'react-native'
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router'
-import { useCallback } from 'react'
 import { useVideoPlayer, VideoView } from 'expo-video'
 import type { Video } from '@abundanz/shared'
 import { api } from '@/utils/api'
@@ -11,8 +10,10 @@ export default function VideoScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const router = useRouter()
   const session = useSession()
+  const { width } = useWindowDimensions()
   const [video, setVideo] = useState<Video | null>(null)
   const [streamUrl, setStreamUrl] = useState<string | null>(null)
+  const [related, setRelated] = useState<Video[]>([])
   const [error, setError] = useState<string | null>(null)
   const [subscribed, setSubscribed] = useState<boolean | null>(null)
 
@@ -28,26 +29,40 @@ export default function VideoScreen() {
     return () => sub.remove()
   }, [player])
 
-  // Re-check subscription each time this screen comes into focus (e.g. returning from paywall)
+  // Pause playback when leaving the screen, resume check on re-focus
   useFocusEffect(
     useCallback(() => {
       setSubscribed(null)
       setError(null)
+      setRelated([])
 
       api.getSubscription()
         .then(({ isSubscribed }) => {
           setSubscribed(isSubscribed)
-          if (!isSubscribed) return
+          if (!isSubscribed) {
+            router.replace('/(app)/paywall')
+            return
+          }
 
           Promise.all([api.getVideo(id), api.getStreamUrl(id)])
             .then(([{ video }, { url }]) => {
               setVideo(video)
               setStreamUrl(url)
               player.replaceAsync({ uri: url, contentType: 'hls' })
+
+              if (video.category) {
+                api.getVideos(video.category)
+                  .then(({ videos }) => setRelated(videos.filter((v) => v.id !== id)))
+                  .catch(() => {})
+              }
             })
             .catch((e) => setError(e.message))
         })
         .catch(() => setSubscribed(false))
+
+      return () => {
+        try { player.pause() } catch {}
+      }
     }, [id])
   )
 
@@ -56,7 +71,7 @@ export default function VideoScreen() {
       <View style={styles.centered}>
         <Text style={styles.lockTitle}>Sign in to watch</Text>
         <Text style={styles.lockSub}>Create a free account to get started.</Text>
-        <TouchableOpacity style={styles.button} onPress={() => router.replace('/(auth)/login')}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push('/(auth)/login')}>
           <Text style={styles.buttonText}>Sign In</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => router.back()} style={styles.backLink}>
@@ -70,21 +85,6 @@ export default function VideoScreen() {
     return (
       <View style={styles.centered}>
         <ActivityIndicator color="#fff" />
-      </View>
-    )
-  }
-
-  if (!subscribed) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.lockTitle}>Subscribe to watch</Text>
-        <Text style={styles.lockSub}>Get unlimited access to all content.</Text>
-        <TouchableOpacity style={styles.button} onPress={() => router.push('/(app)/paywall')}>
-          <Text style={styles.buttonText}>See plans</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backLink}>
-          <Text style={styles.backLinkText}>← Back</Text>
-        </TouchableOpacity>
       </View>
     )
   }
@@ -114,6 +114,8 @@ export default function VideoScreen() {
     ? `${minutes}:${String(seconds).padStart(2, '0')}`
     : null
 
+  const CARD_WIDTH = (width - 16 * 2 - 12) / 2
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -137,6 +139,41 @@ export default function VideoScreen() {
           <Text style={styles.description}>{video.description}</Text>
         )}
       </View>
+
+      {related.length > 0 && (
+        <View style={styles.relatedSection}>
+          <Text style={styles.relatedHeading}>More {video.category}</Text>
+          <FlatList
+            data={related}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            scrollEnabled={false}
+            columnWrapperStyle={styles.gridRow}
+            renderItem={({ item }) => {
+              const itemMinutes = item.durationSeconds ? Math.floor(item.durationSeconds / 60) : null
+              const itemSecs = item.durationSeconds ? item.durationSeconds % 60 : null
+              const itemDuration = itemMinutes !== null && itemSecs !== null
+                ? `${itemMinutes}:${String(itemSecs).padStart(2, '0')}`
+                : null
+              return (
+                <TouchableOpacity
+                  style={[styles.card, { width: CARD_WIDTH }]}
+                  onPress={() => router.push(`/videos/${item.id}`)}
+                  activeOpacity={0.75}
+                >
+                  {item.thumbnailUrl ? (
+                    <Image source={{ uri: item.thumbnailUrl }} style={[styles.thumbnail, { width: CARD_WIDTH, height: CARD_WIDTH * 9 / 16 }]} resizeMode="cover" />
+                  ) : (
+                    <View style={[styles.thumbnailPlaceholder, { width: CARD_WIDTH, height: CARD_WIDTH * 9 / 16 }]} />
+                  )}
+                  <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
+                  {itemDuration && <Text style={styles.cardDuration}>{itemDuration}</Text>}
+                </TouchableOpacity>
+              )
+            }}
+          />
+        </View>
+      )}
     </ScrollView>
   )
 }
@@ -166,4 +203,12 @@ const styles = StyleSheet.create({
   buttonText: { color: '#000', fontWeight: '700', fontSize: 15 },
   backLink: { marginTop: 8 },
   backLinkText: { color: '#52525b', fontSize: 14 },
+  relatedSection: { paddingHorizontal: 16, paddingTop: 32 },
+  relatedHeading: { color: '#fff', fontSize: 17, fontWeight: '600', marginBottom: 16 },
+  gridRow: { gap: 12, marginBottom: 12 },
+  card: { gap: 8 },
+  thumbnail: { borderRadius: 8, backgroundColor: '#18181b' },
+  thumbnailPlaceholder: { borderRadius: 8, backgroundColor: '#18181b' },
+  cardTitle: { color: '#e4e4e7', fontSize: 13, fontWeight: '500', lineHeight: 18 },
+  cardDuration: { color: '#52525b', fontSize: 12 },
 })

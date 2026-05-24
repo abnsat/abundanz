@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { Video } from '@abundanz/shared'
 import { Navbar } from '@/app/components/Navbar'
+import { Footer } from '@/app/components/Footer'
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600)
@@ -26,7 +27,6 @@ export default async function CatalogPage({ searchParams }: Props) {
 
   const { category: activeCategory } = await searchParams
   const allVideos = await db.select().from(videos).orderBy(desc(videos.createdAt))
-  const featured = allVideos[0] ?? null
 
   const byCategory = allVideos.reduce<Record<string, Video[]>>((acc, v) => {
     const cat = v.category ?? 'Other'
@@ -34,17 +34,26 @@ export default async function CatalogPage({ searchParams }: Props) {
     return acc
   }, {})
 
+  // Case-insensitive category key lookup
+  function findCategoryVideos(cat: string): Video[] {
+    const key = Object.keys(byCategory).find(k => k.toLowerCase() === cat.toLowerCase())
+    return key ? byCategory[key] : []
+  }
+
   const displayCategories = activeCategory
-    ? { [activeCategory]: byCategory[activeCategory] ?? [] }
+    ? { [activeCategory]: findCategoryVideos(activeCategory) }
     : byCategory
+
+  const featuredPool = activeCategory ? findCategoryVideos(activeCategory) : allVideos
+  const featured = featuredPool[0] ?? null
 
   return (
     <div className="min-h-screen bg-black text-white">
       <Navbar />
 
-      {/* ── Sticky hero ─────────────────────────────────────────── */}
+      {/* ── Hero ────────────────────────────────────────────────── */}
       {featured && (
-        <div className="sticky top-0 h-screen overflow-hidden">
+        <div className="relative h-[75vh] sm:h-screen overflow-hidden">
           {featured.thumbnailUrl && (
             <Image
               src={featured.thumbnailUrl}
@@ -57,16 +66,16 @@ export default async function CatalogPage({ searchParams }: Props) {
           <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/30 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
 
-          <div className="absolute bottom-0 left-0 px-12 pb-20 max-w-2xl">
-            <span className="inline-block text-[10px] font-bold tracking-[0.25em] uppercase border border-white/40 text-white/80 px-2.5 py-1 rounded-sm mb-5">
+          <div className="absolute bottom-0 left-0 px-6 pb-10 sm:px-12 sm:pb-20 max-w-2xl">
+            <span className="inline-block text-[10px] font-bold tracking-[0.25em] uppercase border border-white/40 text-white/80 px-2.5 py-1 rounded-sm mb-3 sm:mb-5">
               New Release
             </span>
 
-            <h1 className="text-5xl font-bold leading-[1.1] tracking-tight mb-4">
+            <h1 className="text-3xl sm:text-5xl font-bold leading-[1.1] tracking-tight mb-3 sm:mb-4">
               {featured.title}
             </h1>
 
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-3 sm:mb-4">
               {featured.category && (
                 <span className="text-xs font-semibold tracking-widest uppercase text-zinc-400">
                   {featured.category}
@@ -83,7 +92,7 @@ export default async function CatalogPage({ searchParams }: Props) {
             </div>
 
             {featured.description && (
-              <p className="text-zinc-300 text-sm leading-relaxed line-clamp-2 mb-8 max-w-sm">
+              <p className="hidden sm:block text-zinc-300 text-sm leading-relaxed line-clamp-2 mb-8 max-w-sm">
                 {featured.description}
               </p>
             )}
@@ -95,14 +104,14 @@ export default async function CatalogPage({ searchParams }: Props) {
               <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
                 <path d="M2 1.5l10 5.5-10 5.5V1.5z" />
               </svg>
-              {user ? 'Watch Now' : 'Sign In to Watch'}
+              Watch
             </Link>
           </div>
         </div>
       )}
 
       {/* ── Category rows ───────────────────────────────────────── */}
-      <div className="relative z-10 bg-black px-8 pt-12 pb-20 space-y-12">
+      <div className="bg-black px-8 pt-12 pb-20 space-y-12">
         {allVideos.length === 0 && (
           <p className="text-zinc-600 text-sm">No videos yet.</p>
         )}
@@ -114,7 +123,7 @@ export default async function CatalogPage({ searchParams }: Props) {
             </h2>
 
             <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar">
-              {(categoryVideos ?? []).map((video) => (
+              {(categoryVideos ?? []).filter(v => v.id !== featured?.id).map((video) => (
                 <Link
                   key={video.id}
                   href={user ? `/videos/${video.id}` : '/login'}
@@ -172,6 +181,8 @@ export default async function CatalogPage({ searchParams }: Props) {
           </section>
         ))}
       </div>
+
+      <Footer />
     </div>
   )
 }

@@ -15,7 +15,7 @@ export async function Navbar() {
   const { data: { user } } = await supabase.auth.getUser()
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center gap-4 md:gap-8 px-4 md:px-8 py-3 md:py-4 bg-gradient-to-b from-black/90 via-black/50 to-transparent pointer-events-none">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center gap-4 md:gap-8 px-4 md:px-8 py-3 md:py-4 bg-black/90 backdrop-blur-sm pointer-events-none">
       {/* Logo */}
       <Link href="/" className="pointer-events-auto shrink-0">
         <div className="overflow-hidden" style={{ width: 80, height: 50 }}>

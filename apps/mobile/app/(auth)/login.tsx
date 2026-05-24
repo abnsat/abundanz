@@ -6,18 +6,21 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   Image,
   ScrollView,
 } from 'react-native'
+import { useRouter } from 'expo-router'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { supabase } from '@/utils/supabase'
 
 export default function LoginScreen() {
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
+  const router = useRouter()
 
   async function handleSignIn() {
     setLoading(true)
@@ -28,30 +31,38 @@ export default function LoginScreen() {
 
   async function handleSignUp() {
     setLoading(true)
-    const { error } = await supabase.auth.signUp({ email, password })
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { first_name: firstName.trim(), last_name: lastName.trim() } },
+    })
     if (error) Alert.alert('Sign up failed', error.message)
     else Alert.alert('Check your email', 'A confirmation link has been sent.')
     setLoading(false)
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.root}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <View style={styles.root}>
+      {router.canGoBack() && (
+        <SafeAreaView style={styles.closeBar}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.closeBtn} activeOpacity={0.7}>
+            <Text style={styles.closeText}>✕</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
+      )}
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
+        automaticallyAdjustKeyboardInsets
       >
         {/* Logo */}
         <View style={styles.logoWrapper}>
           <Image
             source={require('../../assets/logo.jpeg')}
             style={styles.logo}
-            resizeMode="cover"
+            resizeMode="contain"
           />
-          <Text style={styles.brand}>AbundanZ</Text>
           <Text style={styles.tagline}>Christian Media</Text>
         </View>
 
@@ -77,6 +88,28 @@ export default function LoginScreen() {
 
         {/* Form */}
         <View style={styles.form}>
+          {mode === 'signup' && (
+            <View style={styles.nameRow}>
+              <TextInput
+                style={[styles.input, styles.nameInput]}
+                placeholder="First name"
+                placeholderTextColor="#52525b"
+                value={firstName}
+                onChangeText={setFirstName}
+                autoCapitalize="words"
+                autoComplete="given-name"
+              />
+              <TextInput
+                style={[styles.input, styles.nameInput]}
+                placeholder="Last name"
+                placeholderTextColor="#52525b"
+                value={lastName}
+                onChangeText={setLastName}
+                autoCapitalize="words"
+                autoComplete="family-name"
+              />
+            </View>
+          )}
           <TextInput
             style={styles.input}
             placeholder="Email address"
@@ -114,7 +147,7 @@ export default function LoginScreen() {
           Movies · Documentaries · Kids
         </Text>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </View>
   )
 }
 
@@ -123,6 +156,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
+  closeBar: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 10,
+  },
+  closeBtn: { padding: 20 },
+  closeText: { color: '#52525b', fontSize: 18 },
   container: {
     flexGrow: 1,
     alignItems: 'center',
@@ -135,9 +176,8 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
+    width: 180,
+    height: 180,
     marginBottom: 12,
   },
   brand: {
@@ -181,6 +221,13 @@ const styles = StyleSheet.create({
   form: {
     width: '100%',
     gap: 10,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  nameInput: {
+    flex: 1,
   },
   input: {
     backgroundColor: '#18181b',
