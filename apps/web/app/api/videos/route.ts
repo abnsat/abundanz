@@ -3,7 +3,16 @@ import { videos } from '@abundanz/shared'
 import { db } from '@/utils/db'
 import { sql, desc } from 'drizzle-orm'
 
-const { bunnyVideoId: _omit, ...publicColumns } = videos
+const publicColumns = {
+  id: videos.id,
+  title: videos.title,
+  description: videos.description,
+  category: videos.category,
+  thumbnailUrl: videos.thumbnailUrl,
+  previewUrl: videos.previewUrl,
+  durationSeconds: videos.durationSeconds,
+  createdAt: videos.createdAt,
+}
 
 export async function GET(request: NextRequest) {
   const category = request.nextUrl.searchParams.get('category')
