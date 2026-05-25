@@ -4,12 +4,12 @@
     "appVersionSource": "remote"
   },
   "build": {
-    "autoIncrement": true,
     "development": {
       "developmentClient": true,
       "distribution": "internal"
     },
     "preview": {
+      "autoIncrement": true,
       "distribution": "store",
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://zrrfilmvgttsnpheiwmc.supabase.co",
@@ -20,6 +20,7 @@
       }
     },
     "production": {
+      "autoIncrement": true,
       "distribution": "store",
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://zrrfilmvgttsnpheiwmc.supabase.co",
