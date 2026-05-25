@@ -9,6 +9,7 @@
     "db:generate": "pnpm --filter @abundanz/shared db:generate",
     "db:migrate": "pnpm --filter @abundanz/shared db:migrate"
   },
+  "packageManager": "pnpm@8.15.4",
   "engines": {
     "node": ">=20",
     "pnpm": ">=8"
