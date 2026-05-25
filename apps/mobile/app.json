@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "scheme": "abundanz",
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon": "./assets/logo-icon.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
@@ -19,7 +19,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo.png",
+        "foregroundImage": "./assets/logo-icon.png",
         "backgroundColor": "#000000"
       },
       "package": "com.abundanz.app",

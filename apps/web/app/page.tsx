@@ -149,8 +149,8 @@ export default async function CatalogPage({ searchParams }: Props) {
 
         {Object.entries(displayCategories).map(([category, categoryVideos]) => {
           const total = categoryVideos.length
-          // Slice to one row maximum (lg = 6 cols)
-          const rowVideos = categoryVideos.slice(0, 6)
+          // On the category page (activeCategory set) show everything; on home show one row max
+          const rowVideos = activeCategory ? categoryVideos : categoryVideos.slice(0, 6)
           // "See all" is hidden once all videos fit at that breakpoint.
           // count ≤ 3 → never needed; 4 → hide at sm+; 5 → hide at md+; 6 → hide at lg+; >6 → always visible
           const seeAllHide =
@@ -180,8 +180,8 @@ export default async function CatalogPage({ searchParams }: Props) {
 
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 sm:gap-5">
               {rowVideos.map((video, index) => {
-                // Hide cards that don't fit in one row at smaller breakpoints
-                const cardHide =
+                // Hide cards that overflow one row — only on the home page, never on the category page
+                const cardHide = activeCategory ? '' :
                   index === 3 ? 'hidden sm:block' :
                   index === 4 ? 'hidden md:block' :
                   index === 5 ? 'hidden lg:block' : ''

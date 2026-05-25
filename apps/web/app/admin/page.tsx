@@ -6,6 +6,8 @@ import { eq, desc } from 'drizzle-orm'
 import Link from 'next/link'
 import { Navbar } from '@/app/components/Navbar'
 import { VideoList } from './VideoList'
+import { AdminUsers } from './AdminUsers'
+import { getSupabaseAdmin } from '@/utils/supabase/admin'
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -14,6 +16,11 @@ export default async function AdminPage() {
 
   const [row] = await db.select({ role: users.role }).from(users).where(eq(users.id, user.id))
   if (row?.role !== 'admin') redirect('/')
+
+  const { data: allAdmins } = await getSupabaseAdmin()
+    .from('users')
+    .select('id, email, first_name, last_name, role')
+    .eq('role', 'admin')
 
   const allVideos = await db
     .select({
@@ -48,6 +55,12 @@ export default async function AdminPage() {
           </Link>
         </div>
         <VideoList initialVideos={allVideos} />
+
+        <div className="mt-12 pt-10 border-t border-zinc-800">
+          <h2 className="text-lg font-bold mb-1">Admins</h2>
+          <p className="text-zinc-500 text-sm mt-1 mb-6">Add users by email to grant admin access.</p>
+          <AdminUsers initialAdmins={allAdmins ?? []} currentUserId={user.id} />
+        </div>
       </main>
     </div>
   )
