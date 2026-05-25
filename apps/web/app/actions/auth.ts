@@ -60,7 +60,13 @@ export async function signOut() {
 }
 
 export async function sendPasswordReset(formData: FormData) {
-  const supabase = await createClient()
+  // Use implicit flow so the token_hash has no pkce_ prefix — same reason as signUpWithEmail.
+  // PKCE tokens require the originating device's verifier cookie, which doesn't exist cross-device.
+  const supabase = createBaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { flowType: 'implicit', persistSession: false } }
+  )
   const email = formData.get('email') as string
 
   await supabase.auth.resetPasswordForEmail(email, {
