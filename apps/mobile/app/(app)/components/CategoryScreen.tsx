@@ -239,6 +239,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
     marginTop: 8,
+    marginBottom: 12,
   },
   langBadgeText: { color: 'rgba(255,255,255,0.5)', fontSize: 9, fontWeight: '600', letterSpacing: 1 },
   guestTitle: { color: '#fff', fontSize: 20, fontWeight: '700', textAlign: 'center' },

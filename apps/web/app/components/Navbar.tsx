@@ -70,7 +70,7 @@ export async function Navbar() {
               Account
             </Link>
             <LanguagePicker currentLanguage={userRow?.preferredLanguage ?? null} />
-            <SocialMenu />
+            <SocialMenu preferredLanguage={userRow?.preferredLanguage ?? null} />
             <form action={signOut}>
               <button
                 type="submit"

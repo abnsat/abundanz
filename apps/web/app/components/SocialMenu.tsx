@@ -1,17 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { getSocials } from '@abundanz/shared'
 
-const SOCIALS = [
-  { label: 'Facebook', href: 'https://bassimygorialabn12.wixstudio.com/abnfacebook' },
-  { label: 'Instagram', href: 'https://bassimygorialabn12.wixstudio.com/abninstagram' },
-  { label: 'TikTok', href: 'https://bassimygorialabn12.wixstudio.com/abntiktok' },
-  { label: 'Twitter / X', href: 'https://bassimygorialabn12.wixstudio.com/abntwitter' },
-  { label: 'Telegram', href: 'https://bassimygorialabn12.wixstudio.com/abntelegram' },
-  { label: 'YouTube', href: 'https://bassimygorialabn12.wixstudio.com/abnyoutube2' },
-]
+interface Props { preferredLanguage: string | null }
 
-export function SocialMenu() {
+export function SocialMenu({ preferredLanguage }: Props) {
+  const socials = getSocials(preferredLanguage)
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -35,7 +30,7 @@ export function SocialMenu() {
 
       {open && (
         <div className="absolute right-0 top-full mt-2 w-44 bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden z-50">
-          {SOCIALS.map(({ label, href }) => (
+          {socials.map(({ label, href }) => (
             <a
               key={label}
               href={href}

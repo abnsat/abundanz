@@ -209,7 +209,7 @@ export default async function CatalogPage({ searchParams }: Props) {
         ))}
       </div>
 
-      <Footer />
+      <Footer preferredLanguage={languageFilter} />
     </div>
   )
 }

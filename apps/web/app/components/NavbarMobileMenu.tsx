@@ -4,16 +4,7 @@ import { useState, useEffect, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { signOut } from '@/app/actions/auth'
-import { LANGUAGES } from '@abundanz/shared'
-
-const SOCIALS = [
-  { label: 'Facebook', href: 'https://bassimygorialabn12.wixstudio.com/abnfacebook' },
-  { label: 'Instagram', href: 'https://bassimygorialabn12.wixstudio.com/abninstagram' },
-  { label: 'TikTok', href: 'https://bassimygorialabn12.wixstudio.com/abntiktok' },
-  { label: 'Twitter / X', href: 'https://bassimygorialabn12.wixstudio.com/abntwitter' },
-  { label: 'Telegram', href: 'https://bassimygorialabn12.wixstudio.com/abntelegram' },
-  { label: 'YouTube', href: 'https://bassimygorialabn12.wixstudio.com/abnyoutube2' },
-]
+import { LANGUAGES, getSocials } from '@abundanz/shared'
 
 interface NavLink {
   label: string
@@ -150,7 +141,7 @@ export function NavbarMobileMenu({ navLinks, user, preferredLanguage }: Props) {
         <div className="px-4 py-3 border-t border-zinc-800">
           <p className="text-zinc-600 text-xs font-semibold uppercase tracking-widest px-2 mb-1">Follow Us</p>
           <div className="flex flex-col">
-            {SOCIALS.map(({ label, href }) => (
+            {getSocials(preferredLanguage).map(({ label, href }) => (
               <a
                 key={label}
                 href={href}

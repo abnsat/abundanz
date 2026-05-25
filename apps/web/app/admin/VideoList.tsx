@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import type { PublicVideo } from '@abundanz/shared'
 import { LANGUAGES } from '@abundanz/shared'
@@ -22,12 +22,9 @@ export function VideoList({ initialVideos }: Props) {
   const [videos, setVideos] = useState(initialVideos)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<EditState>({ title: '', description: '', category: '', language: '' })
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const thumbRef = useRef<HTMLInputElement>(null)
 
   function startEdit(video: PublicVideo) {
     setEditingId(video.id)
@@ -37,27 +34,12 @@ export function VideoList({ initialVideos }: Props) {
       category: video.category ?? '',
       language: (video as any).language ?? '',
     })
-    setThumbnailFile(null)
-    setThumbnailPreview(null)
     setError(null)
   }
 
   function cancelEdit() {
     setEditingId(null)
-    setThumbnailFile(null)
-    setThumbnailPreview(null)
     setError(null)
-  }
-
-  function onThumbnailChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0] ?? null
-    setThumbnailFile(file)
-    if (file) {
-      const url = URL.createObjectURL(file)
-      setThumbnailPreview(url)
-    } else {
-      setThumbnailPreview(null)
-    }
   }
 
   async function saveEdit(id: string) {
@@ -71,21 +53,8 @@ export function VideoList({ initialVideos }: Props) {
       })
       if (!res.ok) throw new Error(await res.text())
 
-      if (thumbnailFile) {
-        const fd = new FormData()
-        fd.append('thumbnail', thumbnailFile)
-        const thumbRes = await fetch(`/api/admin/videos/${id}/thumbnail`, { method: 'POST', body: fd })
-        if (!thumbRes.ok) throw new Error('Thumbnail upload failed')
-      }
-
-      setVideos(vs => vs.map(v => v.id === id ? {
-        ...v,
-        ...form,
-        ...(thumbnailPreview ? { thumbnailUrl: thumbnailPreview } : {}),
-      } : v))
+      setVideos(vs => vs.map(v => v.id === id ? { ...v, ...form } : v))
       setEditingId(null)
-      setThumbnailFile(null)
-      setThumbnailPreview(null)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Save failed')
     } finally {
@@ -114,46 +83,6 @@ export function VideoList({ initialVideos }: Props) {
           {editingId === video.id ? (
             <div className="p-5 space-y-3">
               <span className="text-xs text-zinc-600 font-mono block truncate">{video.id}</span>
-
-              {/* Thumbnail */}
-              <div>
-                <label className="block text-xs text-zinc-500 mb-1">Thumbnail</label>
-                <div className="flex items-center gap-3">
-                  <div className="relative w-12 h-16 rounded overflow-hidden bg-zinc-900 shrink-0 border border-zinc-800">
-                    {thumbnailPreview || video.thumbnailUrl ? (
-                      <Image
-                        src={thumbnailPreview ?? video.thumbnailUrl!}
-                        alt=""
-                        fill
-                        className="object-cover"
-                        unoptimized={!!thumbnailPreview}
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="#52525b">
-                          <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-                          <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/>
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => thumbRef.current?.click()}
-                      className="text-xs text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg transition-colors"
-                    >
-                      {thumbnailFile ? 'Change image' : 'Upload image'}
-                    </button>
-                    {thumbnailFile ? (
-                      <p className="text-[11px] text-green-400">{thumbnailFile.name}</p>
-                    ) : (
-                      <p className="text-[11px] text-zinc-600">Bunny.net thumbnail used as fallback</p>
-                    )}
-                  </div>
-                  <input ref={thumbRef} type="file" accept="image/*" className="hidden" onChange={onThumbnailChange} />
-                </div>
-              </div>
 
               <div>
                 <label className="block text-xs text-zinc-500 mb-1">Title</label>

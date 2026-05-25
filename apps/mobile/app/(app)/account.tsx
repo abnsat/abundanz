@@ -1,15 +1,6 @@
 import { useState, useCallback } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, Linking, Alert, ActivityIndicator, ScrollView, Modal, FlatList } from 'react-native'
-import { LANGUAGES } from '@abundanz/shared'
-
-const SOCIALS = [
-  { label: 'Facebook', url: 'https://bassimygorialabn12.wixstudio.com/abnfacebook' },
-  { label: 'Instagram', url: 'https://bassimygorialabn12.wixstudio.com/abninstagram' },
-  { label: 'TikTok', url: 'https://bassimygorialabn12.wixstudio.com/abntiktok' },
-  { label: 'Twitter / X', url: 'https://bassimygorialabn12.wixstudio.com/abntwitter' },
-  { label: 'Telegram', url: 'https://bassimygorialabn12.wixstudio.com/abntelegram' },
-  { label: 'YouTube', url: 'https://bassimygorialabn12.wixstudio.com/abnyoutube2' },
-]
+import { LANGUAGES, getSocials } from '@abundanz/shared'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter, type Href, useFocusEffect } from 'expo-router'
 import { supabase } from '@/utils/supabase'
@@ -185,11 +176,11 @@ export default function AccountScreen() {
         <View style={styles.card}>
           <Text style={styles.cardLabel}>Follow Us</Text>
           <View style={styles.cardBody}>
-            {SOCIALS.map(({ label, url }) => (
+            {getSocials(account?.preferredLanguage ?? null).map(({ label, href }) => (
               <TouchableOpacity
                 key={label}
                 style={styles.socialRow}
-                onPress={() => Linking.openURL(url).catch(() => {})}
+                onPress={() => Linking.openURL(href).catch(() => {})}
                 activeOpacity={0.7}
               >
                 <Text style={styles.socialLabel}>{label}</Text>
