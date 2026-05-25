@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
-import { supabaseAdmin } from '@/utils/supabase/admin'
+import { getSupabaseAdmin } from '@/utils/supabase/admin'
 import { db } from '@/utils/db'
 import { users, videos } from '@abundanz/shared'
 import { eq } from 'drizzle-orm'
@@ -32,7 +32,8 @@ export async function POST(
   const path = `${id}/thumbnail.${ext}`
   const buffer = Buffer.from(await file.arrayBuffer())
 
-  const { error: uploadError } = await supabaseAdmin.storage
+  const admin = getSupabaseAdmin()
+  const { error: uploadError } = await admin.storage
     .from('thumbnails')
     .upload(path, buffer, {
       contentType: file.type || 'image/jpeg',
@@ -44,7 +45,7 @@ export async function POST(
     return NextResponse.json({ error: uploadError.message }, { status: 500 })
   }
 
-  const { data: { publicUrl } } = supabaseAdmin.storage
+  const { data: { publicUrl } } = admin.storage
     .from('thumbnails')
     .getPublicUrl(path)
 
