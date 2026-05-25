@@ -32,22 +32,18 @@ export async function POST(
   const path = `${id}/thumbnail.${ext}`
   const buffer = Buffer.from(await file.arrayBuffer())
 
-  const admin = getSupabaseAdmin()
-  const { error: uploadError } = await admin.storage
-    .from('thumbnails')
-    .upload(path, buffer, {
-      contentType: file.type || 'image/jpeg',
-      upsert: true,
-    })
+  const storage = getSupabaseAdmin().storage.from('thumbnails')
+  const { error: uploadError } = await storage.upload(path, buffer, {
+    contentType: file.type || 'image/jpeg',
+    upsert: true,
+  })
 
   if (uploadError) {
     console.error('[thumbnail upload] storage error:', uploadError)
     return NextResponse.json({ error: uploadError.message }, { status: 500 })
   }
 
-  const { data: { publicUrl } } = admin.storage
-    .from('thumbnails')
-    .getPublicUrl(path)
+  const { data: { publicUrl } } = storage.getPublicUrl(path)
 
   await db.update(videos).set({ thumbnailUrl: publicUrl }).where(eq(videos.id, id))
 
