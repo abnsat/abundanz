@@ -157,7 +157,7 @@ export function NavbarMobileMenu({ navLinks, user, preferredLanguage }: Props) {
         </div>
 
         {/* Bottom auth section */}
-        <div className="px-4 pb-8 pt-4 border-t border-zinc-800 flex flex-col gap-2">
+        <div className="px-4 pt-4 border-t border-zinc-800 flex flex-col gap-2" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
           {user ? (
             <>
               <Link
