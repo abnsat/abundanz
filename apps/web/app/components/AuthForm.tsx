@@ -1,11 +1,54 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
-import { signInWithEmail, signUpWithEmail } from '@/app/actions/auth'
+import { signInWithEmail, signUpWithEmail, sendPasswordReset } from '@/app/actions/auth'
+
+type Mode = 'signin' | 'signup' | 'forgot'
 
 export function AuthForm() {
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
+  const [mode, setMode] = useState<Mode>('signin')
+  const [resetSent, setResetSent] = useState(false)
+
+  const inputClass = 'w-full bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600 px-4 py-3.5 rounded-lg text-sm focus:outline-none focus:border-zinc-600 transition-colors'
+  const btnClass = 'w-full bg-[var(--color-accent)] text-[var(--color-accent-fg)] font-semibold py-3.5 rounded-lg text-sm hover:opacity-90 transition-opacity'
+
+  if (mode === 'forgot') {
+    return (
+      <>
+        {resetSent ? (
+          <div className="bg-emerald-950/60 border border-emerald-800/40 text-emerald-400 text-sm px-4 py-3 rounded-lg mb-5">
+            If an account exists for that email, a reset link is on its way.
+          </div>
+        ) : (
+          <form className="space-y-3 mb-5">
+            <input
+              name="email"
+              type="email"
+              placeholder="Email address"
+              required
+              autoComplete="email"
+              className={inputClass}
+            />
+            <button
+              formAction={async (fd) => { await sendPasswordReset(fd); setResetSent(true) }}
+              className={btnClass}
+            >
+              Send reset link
+            </button>
+          </form>
+        )}
+        <p className="text-center text-xs text-zinc-600 mb-5">
+          <button
+            type="button"
+            onClick={() => { setMode('signin'); setResetSent(false) }}
+            className="text-zinc-400 hover:text-white transition-colors underline underline-offset-2"
+          >
+            Back to sign in
+          </button>
+        </p>
+      </>
+    )
+  }
 
   return (
     <>
@@ -18,7 +61,7 @@ export function AuthForm() {
               placeholder="First name"
               required
               autoComplete="given-name"
-              className="w-full bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600 px-4 py-3.5 rounded-lg text-sm focus:outline-none focus:border-zinc-600 transition-colors"
+              className={inputClass}
             />
             <input
               name="lastName"
@@ -26,7 +69,7 @@ export function AuthForm() {
               placeholder="Last name"
               required
               autoComplete="family-name"
-              className="w-full bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600 px-4 py-3.5 rounded-lg text-sm focus:outline-none focus:border-zinc-600 transition-colors"
+              className={inputClass}
             />
           </div>
         )}
@@ -36,7 +79,7 @@ export function AuthForm() {
           placeholder="Email address"
           required
           autoComplete="email"
-          className="w-full bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600 px-4 py-3.5 rounded-lg text-sm focus:outline-none focus:border-zinc-600 transition-colors"
+          className={inputClass}
         />
         <input
           name="password"
@@ -44,27 +87,25 @@ export function AuthForm() {
           placeholder="Password"
           required
           autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-          className="w-full bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600 px-4 py-3.5 rounded-lg text-sm focus:outline-none focus:border-zinc-600 transition-colors"
+          className={inputClass}
         />
         {mode === 'signin' ? (
           <>
-            <button
-              formAction={signInWithEmail}
-              className="w-full bg-[var(--color-accent)] text-[var(--color-accent-fg)] font-semibold py-3.5 rounded-lg text-sm hover:opacity-90 transition-opacity"
-            >
+            <button formAction={signInWithEmail} className={btnClass}>
               Sign In
             </button>
             <div className="text-right">
-              <Link href="/forgot-password" className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
+              <button
+                type="button"
+                onClick={() => setMode('forgot')}
+                className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+              >
                 Forgot password?
-              </Link>
+              </button>
             </div>
           </>
         ) : (
-          <button
-            formAction={signUpWithEmail}
-            className="w-full bg-[var(--color-accent)] text-[var(--color-accent-fg)] font-semibold py-3.5 rounded-lg text-sm hover:opacity-90 transition-opacity"
-          >
+          <button formAction={signUpWithEmail} className={btnClass}>
             Create Account
           </button>
         )}

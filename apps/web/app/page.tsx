@@ -49,9 +49,20 @@ export default async function CatalogPage({ searchParams }: Props) {
     return key ? byCategory[key] : []
   }
 
+  const CATEGORY_ORDER = ['Movies', 'Documentaries', 'Kids', 'Discipleship']
+
   const displayCategories = activeCategory
     ? { [activeCategory]: findCategoryVideos(activeCategory) }
-    : byCategory
+    : Object.fromEntries(
+        Object.entries(byCategory).sort(([a], [b]) => {
+          const ai = CATEGORY_ORDER.indexOf(a)
+          const bi = CATEGORY_ORDER.indexOf(b)
+          if (ai !== -1 && bi !== -1) return ai - bi
+          if (ai !== -1) return -1
+          if (bi !== -1) return 1
+          return 0
+        })
+      )
 
   const featuredPool = activeCategory ? findCategoryVideos(activeCategory) : allVideos
   const featured = featuredPool[0] ?? null
