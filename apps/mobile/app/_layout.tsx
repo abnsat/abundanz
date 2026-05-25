@@ -6,14 +6,14 @@ import { supabase } from '@/utils/supabase'
 import { configurePurchases, loginPurchases, logoutPurchases } from '@/utils/purchases'
 import { SessionContext } from '@/utils/session'
 
-configurePurchases()
-
 export default function RootLayout() {
   const [session, setSession] = useState<Session | null | undefined>(undefined)
   const router = useRouter()
   const segments = useSegments()
 
   useEffect(() => {
+    configurePurchases()
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       if (session) loginPurchases(session.user.id).catch(() => {})
