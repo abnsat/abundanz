@@ -8,10 +8,11 @@ import {
   StyleSheet,
   ActivityIndicator,
   Dimensions,
-  SafeAreaView,
 } from 'react-native'
 import { Image as ExpoImage } from 'expo-image'
+import { Ionicons } from '@expo/vector-icons'
 import { useRouter, type Href } from 'expo-router'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import type { Video } from '@abundanz/shared'
 import { api } from '@/utils/api'
 import { useSession } from '@/utils/session'
@@ -33,6 +34,7 @@ export function CategoryScreen({ category }: Props) {
   const router = useRouter()
   const session = useSession()
   const isGuest = !session
+  const insets = useSafeAreaInsets()
 
   useEffect(() => {
     setLoading(true)
@@ -50,9 +52,9 @@ export function CategoryScreen({ category }: Props) {
     else router.push(`/videos/${id}` as Href)
   }
 
-  const hero = (
-    <View style={styles.heroWrapper}>
-      <View style={styles.hero}>
+  const header = (
+    <View>
+      <View style={[styles.hero, { marginTop: -insets.top, height: HERO_HEIGHT + insets.top }]}>
         {(featured?.previewUrl ?? featured?.thumbnailUrl) ? (
           <ExpoImage
             source={{ uri: featured.previewUrl ?? featured.thumbnailUrl ?? undefined }}
@@ -64,7 +66,6 @@ export function CategoryScreen({ category }: Props) {
           <View style={[StyleSheet.absoluteFill, { backgroundColor: '#111' }]} />
         )}
         <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.45)' }]} />
-        <SafeAreaView />
         {featured && (
           <TouchableOpacity style={styles.heroMeta} onPress={() => handleVideoPress(featured.id)} activeOpacity={0.85}>
             <View style={styles.newReleaseBadge}>
@@ -82,13 +83,16 @@ export function CategoryScreen({ category }: Props) {
           </TouchableOpacity>
         )}
       </View>
+      <View style={styles.categoryHeader}>
+        <Text style={styles.categoryTitle}>{category}</Text>
+      </View>
     </View>
   )
 
   if (loading) {
     return (
       <View style={styles.container}>
-        {hero}
+        {header}
         <View style={styles.centered}><ActivityIndicator color="#fff" /></View>
       </View>
     )
@@ -97,7 +101,7 @@ export function CategoryScreen({ category }: Props) {
   if (error) {
     return (
       <View style={styles.container}>
-        {hero}
+        {header}
         <View style={styles.centered}>
           {(error.includes('401') || error.includes('Unauthorized')) && isGuest ? (
             <>
@@ -122,7 +126,7 @@ export function CategoryScreen({ category }: Props) {
         keyExtractor={(v) => v.id}
         numColumns={2}
         showsVerticalScrollIndicator={false}
-        ListHeaderComponent={hero}
+        ListHeaderComponent={header}
         ListEmptyComponent={
           <View style={styles.centered}>
             <Text style={styles.empty}>No videos in this category yet.</Text>
@@ -141,7 +145,7 @@ export function CategoryScreen({ category }: Props) {
               )}
               {isGuest && (
                 <View style={styles.lockOverlay}>
-                  <Text style={styles.lockIcon}>🔒</Text>
+                  <Ionicons name="lock-closed" size={16} color="white" />
                 </View>
               )}
             </View>
@@ -158,7 +162,7 @@ export function CategoryScreen({ category }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
-  heroWrapper: { marginBottom: 24 },
+  
   hero: {
     width: SCREEN_WIDTH,
     height: HERO_HEIGHT,
@@ -185,8 +189,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 24,
-    paddingBottom: 28,
+    paddingHorizontal: GRID_PADDING,
+    paddingTop: 24,
+    paddingBottom: 88,
   },
   heroTitle: {
     color: '#fff',
@@ -207,8 +212,10 @@ const styles = StyleSheet.create({
   },
   heroButtonText: { color: '#000', fontWeight: '700', fontSize: 14 },
   centered: { paddingVertical: 40, alignItems: 'center', paddingHorizontal: 32 },
-  grid: { backgroundColor: '#000' },
-  gridRow: { justifyContent: 'space-between', marginBottom: GRID_GAP, paddingHorizontal: GRID_PADDING },
+  categoryHeader: { paddingHorizontal: GRID_PADDING, paddingTop: 8, paddingBottom: 8, marginTop: -40 },
+  categoryTitle: { color: '#a1a1aa', fontSize: 17, fontWeight: '600', letterSpacing: 1.5, textTransform: 'uppercase', includeFontPadding: false, paddingBottom: 10 },
+  grid: { backgroundColor: '#000', paddingTop: 0 },
+  gridRow: { justifyContent: 'space-between', marginBottom: GRID_GAP, paddingHorizontal: GRID_PADDING, marginTop: 0 },
   card: { width: CARD_WIDTH },
   cardThumb: {
     width: CARD_WIDTH,
@@ -228,7 +235,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     padding: 6,
   },
-  lockIcon: { fontSize: 12 },
   cardTitle: { color: '#a1a1aa', fontSize: 12, lineHeight: 16, fontWeight: '500' },
   cardLang: { color: '#52525b', fontSize: 10, marginTop: 3 },
   langBadge: {

@@ -58,3 +58,25 @@ export async function signOut() {
   await supabase.auth.signOut()
   redirect('/login')
 }
+
+export async function sendPasswordReset(formData: FormData) {
+  const supabase = await createClient()
+  const email = formData.get('email') as string
+
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=/reset-password`,
+  })
+  // Always show success — never reveal whether the email exists
+  redirect('/forgot-password?message=If+an+account+exists+for+that+email%2C+a+reset+link+is+on+its+way.')
+}
+
+export async function updatePassword(formData: FormData) {
+  const supabase = await createClient()
+  const password = formData.get('password') as string
+
+  const { error } = await supabase.auth.updateUser({ password })
+  if (error) redirect(`/reset-password?error=${encodeURIComponent(error.message)}`)
+
+  await supabase.auth.signOut()
+  redirect('/login?message=Password+updated.+Please+sign+in+with+your+new+password.')
+}

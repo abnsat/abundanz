@@ -62,7 +62,7 @@ export default async function CatalogPage({ searchParams }: Props) {
 
       {/* ── Hero ────────────────────────────────────────────────── */}
       {featured && (
-        <div className="relative h-[55vh] sm:h-screen overflow-hidden">
+        <div className="relative h-[70vh] sm:h-screen overflow-hidden">
           {featured.previewUrl ? (
             <img
               src={featured.previewUrl}
@@ -81,7 +81,7 @@ export default async function CatalogPage({ searchParams }: Props) {
           <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/30 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
 
-          <div className="absolute bottom-0 left-0 right-0 px-6 pb-10 sm:px-12 sm:pb-20 sm:max-w-2xl sm:right-auto">
+           <div className="absolute bottom-0 left-0 right-0 px-6 pb-10 sm:px-12 sm:pb-20 sm:max-w-2xl sm:right-auto">
             <span className="inline-block text-[10px] font-bold tracking-[0.25em] uppercase border border-white/40 text-white/80 px-2.5 py-1 rounded-sm mb-3 sm:mb-5">
               New Release
             </span>
@@ -131,23 +131,55 @@ export default async function CatalogPage({ searchParams }: Props) {
       )}
 
       {/* ── Category rows ───────────────────────────────────────── */}
-      <div className="bg-black px-4 sm:px-8 pt-12 pb-20 space-y-12">
+      <div className="bg-black px-4 sm:px-12 pb-10 space-y-8">
         {allVideos.length === 0 && (
           <p className="text-zinc-600 text-sm">No videos yet.</p>
         )}
 
-        {Object.entries(displayCategories).map(([category, categoryVideos]) => (
+        {Object.entries(displayCategories).map(([category, categoryVideos]) => {
+          const total = categoryVideos.length
+          // Slice to one row maximum (lg = 6 cols)
+          const rowVideos = categoryVideos.slice(0, 6)
+          // "See all" is hidden once all videos fit at that breakpoint.
+          // count ≤ 3 → never needed; 4 → hide at sm+; 5 → hide at md+; 6 → hide at lg+; >6 → always visible
+          const seeAllHide =
+            total <= 3 ? 'hidden' :
+            total === 4 ? 'sm:hidden' :
+            total === 5 ? 'md:hidden' :
+            total === 6 ? 'lg:hidden' : ''
+
+          return (
           <section key={category}>
-            <h2 className="text-base font-semibold tracking-widest uppercase text-zinc-400 mb-5">
-              {category}
-            </h2>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-xl font-semibold tracking-widest uppercase text-zinc-400">
+                {category}
+              </h2>
+              {!activeCategory && total > 3 && (
+                <Link
+                  href={`/?category=${encodeURIComponent(category)}`}
+                  className={`flex items-center gap-1.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors shrink-0 group ${seeAllHide}`}
+                >
+                  See all
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-0.5 transition-transform">
+                    <path d="M2 7h10M8 3l4 4-4 4"/>
+                  </svg>
+                </Link>
+              )}
+            </div>
 
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 sm:gap-5">
-              {(categoryVideos ?? []).map((video) => (
+              {rowVideos.map((video, index) => {
+                // Hide cards that don't fit in one row at smaller breakpoints
+                const cardHide =
+                  index === 3 ? 'hidden sm:block' :
+                  index === 4 ? 'hidden md:block' :
+                  index === 5 ? 'hidden lg:block' : ''
+
+                return (
                 <Link
                   key={video.id}
                   href={user ? `/videos/${video.id}` : '/login'}
-                  className="group"
+                  className={`group ${cardHide}`}
                 >
                   <div className="aspect-[2/3] bg-zinc-900 rounded-lg overflow-hidden relative mb-3">
                     {video.thumbnailUrl ? (
@@ -203,10 +235,12 @@ export default async function CatalogPage({ searchParams }: Props) {
                     {video.title}
                   </p>
                 </Link>
-              ))}
+                )
+              })}
             </div>
           </section>
-        ))}
+          )
+        })}
       </div>
 
       <Footer preferredLanguage={languageFilter} />

@@ -84,7 +84,7 @@ export function NavbarMobileMenu({ navLinks, user, preferredLanguage }: Props) {
         </div>
 
         {/* Nav links */}
-        <nav className="flex flex-col px-4 py-4 gap-1 flex-1">
+        <nav className="flex flex-col px-4 py-2 gap-1 flex-1">
           {navLinks.map(({ label, href }) => (
             <Link
               key={label}
@@ -174,7 +174,7 @@ export function NavbarMobileMenu({ navLinks, user, preferredLanguage }: Props) {
               <form action={signOut}>
                 <button
                   type="submit"
-                  className="w-full flex items-center gap-2.5 text-zinc-500 hover:text-white hover:bg-zinc-800 px-4 py-3 rounded-lg text-sm font-medium transition-colors"
+                  className="w-full flex items-center gap-2.5 text-red-500 hover:text-red-400 hover:bg-zinc-800 px-4 py-3 rounded-lg text-sm font-medium transition-colors"
                 >
                   <svg width="15" height="15" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
                     <path d="M5 7h7M9.5 4.5L12 7l-2.5 2.5"/>

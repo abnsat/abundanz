@@ -45,19 +45,9 @@ export default async function LoginPage({ searchParams }: Props) {
       {/* ── Auth panel ───────────────────────────────────────────────── */}
       <div className="w-full lg:w-[440px] shrink-0 flex flex-col items-center justify-center px-10 py-16 bg-black">
 
-        {/* Logo — simple <img> crop: show top ~50% of the JPEG (AZ icon only) */}
         <div className="mb-8 flex flex-col items-center">
-          <div
-            className="overflow-hidden"
-            style={{ width: 120, height: 86 }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo.jpeg"
-              alt="AbundanZ logo"
-              style={{ width: 120, height: 'auto', display: 'block' }}
-            />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-full.png" alt="AbundanZ logo" style={{ width: 160, height: 'auto', display: 'block' }} />
         </div>
 
         <div className="w-full max-w-[340px]">

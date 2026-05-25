@@ -7,6 +7,7 @@ const geist = Geist({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Abundanz',
   description: 'Stream AI-generated videos',
+  icons: { icon: '/logo.png' },
 }
 
 export const viewport: Viewport = {

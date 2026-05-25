@@ -10,6 +10,7 @@ const LINKS = [
   { label: 'Discipleship', href: '/?category=Discipleship' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Account', href: '/account' },
+  { label: 'Contact', href: '/contact' },
   { label: 'Privacy', href: '/privacy' },
   { label: 'Terms', href: '/terms' },
 ]
@@ -57,10 +58,8 @@ export function Footer({ preferredLanguage = null }: Props) {
       <div className="max-w-6xl mx-auto flex flex-col items-center gap-5">
 
         {/* Logo */}
-        <div className="overflow-hidden" style={{ width: 60, height: 38 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.jpeg" alt="AbundanZ" style={{ width: 60, height: 'auto', display: 'block' }} />
-        </div>
+          <img src="/logo.png" alt="AbundanZ" style={{ width: 60, height: 'auto', display: 'block' }} />
 
         {/* Social icons */}
         <div className="flex items-center gap-5">

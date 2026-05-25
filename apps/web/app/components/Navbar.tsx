@@ -28,10 +28,8 @@ export async function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 flex items-center gap-4 md:gap-8 px-4 md:px-8 py-3 md:py-4 bg-black/90 pointer-events-none">
       {/* Logo */}
       <Link href="/" className="pointer-events-auto shrink-0">
-        <div className="overflow-hidden" style={{ width: 80, height: 50 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.jpeg" alt="AbundanZ" style={{ width: 80, height: 'auto', display: 'block' }} />
-        </div>
+          <img src="/logo.png" alt="AbundanZ" style={{ width: 60, height: 'auto', display: 'block' }} />
       </Link>
 
       {/* Category nav — desktop only */}
@@ -74,7 +72,7 @@ export async function Navbar() {
             <form action={signOut}>
               <button
                 type="submit"
-                className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-white px-3 py-1.5 rounded-full border border-transparent hover:border-zinc-700 transition-colors"
+                className="flex items-center gap-1.5 text-sm text-red-500 hover:text-red-400 px-3 py-1.5 rounded-full border border-transparent hover:border-red-800 transition-colors"
               >
                 <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
                   <path d="M5 7h7M9.5 4.5L12 7l-2.5 2.5"/>

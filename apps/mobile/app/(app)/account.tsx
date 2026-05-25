@@ -199,6 +199,13 @@ export default function AccountScreen() {
         </View>
 
         <View style={styles.section}>
+          <TouchableOpacity style={styles.row} onPress={() => router.push('/contact' as Href)} activeOpacity={0.7}>
+            <Text style={styles.rowText}>Contact Us</Text>
+            <Text style={styles.chevron}>›</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.section}>
           <TouchableOpacity style={styles.row} onPress={signOut} activeOpacity={0.7}>
             <Text style={styles.danger}>Sign Out</Text>
           </TouchableOpacity>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { signInWithEmail, signUpWithEmail } from '@/app/actions/auth'
 
 export function AuthForm() {
@@ -46,12 +47,19 @@ export function AuthForm() {
           className="w-full bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600 px-4 py-3.5 rounded-lg text-sm focus:outline-none focus:border-zinc-600 transition-colors"
         />
         {mode === 'signin' ? (
-          <button
-            formAction={signInWithEmail}
-            className="w-full bg-[var(--color-accent)] text-[var(--color-accent-fg)] font-semibold py-3.5 rounded-lg text-sm hover:opacity-90 transition-opacity"
-          >
-            Sign In
-          </button>
+          <>
+            <button
+              formAction={signInWithEmail}
+              className="w-full bg-[var(--color-accent)] text-[var(--color-accent-fg)] font-semibold py-3.5 rounded-lg text-sm hover:opacity-90 transition-opacity"
+            >
+              Sign In
+            </button>
+            <div className="text-right">
+              <Link href="/forgot-password" className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">
+                Forgot password?
+              </Link>
+            </div>
+          </>
         ) : (
           <button
             formAction={signUpWithEmail}
