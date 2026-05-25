@@ -4,6 +4,7 @@
     "appVersionSource": "remote"
   },
   "build": {
+    "autoIncrement": true,
     "development": {
       "developmentClient": true,
       "distribution": "internal"
