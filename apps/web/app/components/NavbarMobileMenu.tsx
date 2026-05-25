@@ -90,7 +90,7 @@ export function NavbarMobileMenu({ navLinks, user, preferredLanguage }: Props) {
               key={label}
               href={href}
               onClick={() => setOpen(false)}
-              className="text-zinc-300 hover:text-white hover:bg-zinc-800 px-4 py-3 rounded-lg text-sm font-medium tracking-widest uppercase transition-colors"
+              className="text-zinc-300 hover:text-white hover:bg-zinc-800 px-4 py-2 rounded-lg text-xs font-medium tracking-widest uppercase transition-colors"
             >
               {label}
             </Link>
