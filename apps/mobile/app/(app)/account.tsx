@@ -1,5 +1,15 @@
 import { useState, useCallback } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, Linking, Alert, ActivityIndicator, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Linking, Alert, ActivityIndicator, ScrollView, Modal, FlatList } from 'react-native'
+import { LANGUAGES } from '@abundanz/shared'
+
+const SOCIALS = [
+  { label: 'Facebook', url: 'https://bassimygorialabn12.wixstudio.com/abnfacebook' },
+  { label: 'Instagram', url: 'https://bassimygorialabn12.wixstudio.com/abninstagram' },
+  { label: 'TikTok', url: 'https://bassimygorialabn12.wixstudio.com/abntiktok' },
+  { label: 'Twitter / X', url: 'https://bassimygorialabn12.wixstudio.com/abntwitter' },
+  { label: 'Telegram', url: 'https://bassimygorialabn12.wixstudio.com/abntelegram' },
+  { label: 'YouTube', url: 'https://bassimygorialabn12.wixstudio.com/abnyoutube2' },
+]
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter, type Href, useFocusEffect } from 'expo-router'
 import { supabase } from '@/utils/supabase'
@@ -23,6 +33,8 @@ export default function AccountScreen() {
   const [account, setAccount] = useState<AccountData | null>(null)
   const [isSubscribed, setIsSubscribed] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(true)
+  const [langModalOpen, setLangModalOpen] = useState(false)
+  const [savingLang, setSavingLang] = useState(false)
   const session = useSession()
   const router = useRouter()
 
@@ -49,6 +61,18 @@ export default function AccountScreen() {
     Linking.openURL(url).catch(() => {
       Alert.alert('Could not open', 'Visit abundanz.ai/account to manage your subscription.')
     })
+  }
+
+  async function selectLanguage(lang: string | null) {
+    setSavingLang(true)
+    try {
+      await api.updatePreferences({ preferredLanguage: lang })
+      setAccount(a => a ? { ...a, preferredLanguage: lang } : a)
+    } catch {}
+    finally {
+      setSavingLang(false)
+      setLangModalOpen(false)
+    }
   }
 
   async function signOut() {
@@ -157,6 +181,32 @@ export default function AccountScreen() {
           </View>
         ) : null}
 
+        {/* Follow us */}
+        <View style={styles.card}>
+          <Text style={styles.cardLabel}>Follow Us</Text>
+          <View style={styles.cardBody}>
+            {SOCIALS.map(({ label, url }) => (
+              <TouchableOpacity
+                key={label}
+                style={styles.socialRow}
+                onPress={() => Linking.openURL(url).catch(() => {})}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.socialLabel}>{label}</Text>
+                <Text style={styles.chevron}>›</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Language */}
+        <View style={styles.section}>
+          <TouchableOpacity style={styles.row} onPress={() => setLangModalOpen(true)} activeOpacity={0.7} disabled={savingLang}>
+            <Text style={styles.rowText}>Language</Text>
+            <Text style={styles.rowValue}>{account?.preferredLanguage ?? 'All'}</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.section}>
           <TouchableOpacity style={styles.row} onPress={signOut} activeOpacity={0.7}>
             <Text style={styles.danger}>Sign Out</Text>
@@ -164,6 +214,40 @@ export default function AccountScreen() {
         </View>
 
       </ScrollView>
+
+      {/* Language picker modal */}
+      <Modal visible={langModalOpen} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setLangModalOpen(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Language</Text>
+            <TouchableOpacity onPress={() => setLangModalOpen(false)}>
+              <Text style={styles.modalClose}>Done</Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={[null, ...LANGUAGES]}
+            keyExtractor={(item) => item ?? '__all__'}
+            renderItem={({ item }) => {
+              const isSelected = item === null
+                ? !account?.preferredLanguage
+                : account?.preferredLanguage === item
+              return (
+                <TouchableOpacity
+                  style={styles.langRow}
+                  onPress={() => selectLanguage(item)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.langText, isSelected && styles.langTextActive]}>
+                    {item ?? 'All Languages'}
+                  </Text>
+                  {isSelected && <Text style={styles.langCheck}>✓</Text>}
+                </TouchableOpacity>
+              )
+            }}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+          />
+        </View>
+      </Modal>
     </SafeAreaView>
   )
 }
@@ -226,7 +310,30 @@ const styles = StyleSheet.create({
   rowText: { color: '#e4e4e7', fontSize: 15, fontWeight: '500' },
   chevron: { color: '#52525b', fontSize: 20 },
   danger: { color: '#f87171', fontSize: 15, fontWeight: '500' },
+  rowValue: { color: '#71717a', fontSize: 14 },
+  socialRow: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingVertical: 8,
+  },
+  socialLabel: { color: '#e4e4e7', fontSize: 14, fontWeight: '500' },
 
-  button: { backgroundColor: '#fff', borderRadius: 10, paddingVertical: 13, alignItems: 'center', marginTop: 4 },
+  button: { width: 130, backgroundColor: '#fff', borderRadius: 10, paddingVertical: 13, alignItems: 'center', marginTop: 4 },
   buttonText: { color: '#000', fontWeight: '700', fontSize: 15 },
+
+  modalContainer: { flex: 1, backgroundColor: '#000' },
+  modalHeader: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingHorizontal: 20, paddingVertical: 16,
+    borderBottomWidth: 1, borderBottomColor: '#27272a',
+  },
+  modalTitle: { color: '#fff', fontSize: 17, fontWeight: '600' },
+  modalClose: { color: '#a1a1aa', fontSize: 15 },
+  langRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 20, paddingVertical: 14,
+  },
+  langText: { color: '#71717a', fontSize: 15 },
+  langTextActive: { color: '#fff', fontWeight: '600' },
+  langCheck: { color: '#fff', fontSize: 16 },
+  separator: { height: 1, backgroundColor: '#18181b', marginHorizontal: 20 },
 })

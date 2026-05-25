@@ -1,4 +1,4 @@
-import { pgTable, pgEnum, text, boolean, integer, timestamp } from 'drizzle-orm/pg-core'
+import { pgTable, pgEnum, text, boolean, integer, timestamp, unique } from 'drizzle-orm/pg-core'
 import { createId } from '@paralleldrive/cuid2'
 
 export const userRoleEnum = pgEnum('user_role', ['user', 'admin'])
@@ -10,6 +10,7 @@ export const users = pgTable('users', {
   firstName: text('first_name'),
   lastName: text('last_name'),
   role: userRoleEnum('role').default('user').notNull(),
+  preferredLanguage: text('preferred_language').default('English'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
@@ -22,9 +23,19 @@ export const videos = pgTable('videos', {
   thumbnailUrl: text('thumbnail_url'),
   previewUrl: text('preview_url'),
   durationSeconds: integer('duration_seconds'),
+  language: text('language'),
   status: text('status').default('ready').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 })
+
+export const videoReactions = pgTable('video_reactions', {
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  videoId: text('video_id').notNull().references(() => videos.id, { onDelete: 'cascade' }),
+  reaction: text('reaction').notNull(), // 'like' | 'dislike'
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [
+  unique().on(t.userId, t.videoId),
+])
 
 export const subscriptions = pgTable('subscriptions', {
   userId: text('user_id').primaryKey().references(() => users.id, { onDelete: 'cascade' }),

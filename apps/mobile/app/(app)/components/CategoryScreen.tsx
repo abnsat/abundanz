@@ -71,6 +71,11 @@ export function CategoryScreen({ category }: Props) {
               <Text style={styles.newReleaseText}>NEW RELEASE</Text>
             </View>
             <Text style={styles.heroTitle} numberOfLines={3}>{featured.title}</Text>
+            {featured.language && (
+              <View style={styles.langBadge}>
+                <Text style={styles.langBadgeText}>{featured.language}</Text>
+              </View>
+            )}
             <View style={styles.heroButton}>
               <Text style={styles.heroButtonText}>▶  Watch</Text>
             </View>
@@ -141,6 +146,9 @@ export function CategoryScreen({ category }: Props) {
               )}
             </View>
             <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
+            {item.language && (
+              <Text style={styles.cardLang}>{item.language}</Text>
+            )}
           </TouchableOpacity>
         )}
       />
@@ -222,6 +230,17 @@ const styles = StyleSheet.create({
   },
   lockIcon: { fontSize: 12 },
   cardTitle: { color: '#a1a1aa', fontSize: 12, lineHeight: 16, fontWeight: '500' },
+  cardLang: { color: '#52525b', fontSize: 10, marginTop: 3 },
+  langBadge: {
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 3,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginTop: 8,
+  },
+  langBadgeText: { color: 'rgba(255,255,255,0.5)', fontSize: 9, fontWeight: '600', letterSpacing: 1 },
   guestTitle: { color: '#fff', fontSize: 20, fontWeight: '700', textAlign: 'center' },
   guestSub: { color: '#52525b', fontSize: 14, textAlign: 'center', marginBottom: 8 },
   guestButton: { backgroundColor: '#fff', borderRadius: 10, paddingVertical: 14, paddingHorizontal: 40 },

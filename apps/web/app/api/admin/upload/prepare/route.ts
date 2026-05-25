@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   const admin = await getAdminUser()
   if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const { title, description, category } = await request.json()
+  const { title, description, category, language } = await request.json()
   if (!title?.trim()) return NextResponse.json({ error: 'Title is required' }, { status: 400 })
 
   const bunnyVideoId = await createBunnyVideo(title.trim())
@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
       title: title.trim(),
       description: description?.trim() || null,
       category: category?.trim() || null,
+      language: language?.trim() || null,
       bunnyVideoId,
       thumbnailUrl: getBunnyThumbnailUrl(bunnyVideoId),
       previewUrl: getBunnyPreviewUrl(bunnyVideoId),

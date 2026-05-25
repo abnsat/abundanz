@@ -46,7 +46,25 @@ export function createApiClient(baseUrl: string, getToken: () => Promise<string 
         source: 'stripe' | 'apple' | 'google' | null
         expiresAt: string | null
         cancelAtPeriodEnd: boolean
+        preferredLanguage: string | null
       }>('/api/account'),
+
+    updatePreferences: (prefs: { preferredLanguage: string | null }) =>
+      request<{ ok: boolean }>('/api/preferences', {
+        method: 'PATCH',
+        body: JSON.stringify(prefs),
+      }),
+
+    getReactions: (videoId: string) =>
+      request<{ likes: number; dislikes: number; userReaction: 'like' | 'dislike' | null }>(
+        `/api/videos/${videoId}/reactions`
+      ),
+
+    react: (videoId: string, reaction: 'like' | 'dislike' | null) =>
+      request<{ likes: number; dislikes: number; userReaction: 'like' | 'dislike' | null }>(
+        `/api/videos/${videoId}/react`,
+        { method: 'POST', body: JSON.stringify({ reaction }) }
+      ),
   }
 }
 

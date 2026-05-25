@@ -21,6 +21,7 @@ export default async function AdminPage() {
       title: videos.title,
       description: videos.description,
       category: videos.category,
+      language: videos.language,
       thumbnailUrl: videos.thumbnailUrl,
       previewUrl: videos.previewUrl,
       durationSeconds: videos.durationSeconds,

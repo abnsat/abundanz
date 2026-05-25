@@ -31,6 +31,29 @@ export function getBunnyPreviewUrl(bunnyVideoId: string): string {
   return `https://${process.env.BUNNY_CDN_HOSTNAME}/${bunnyVideoId}/preview.webp`
 }
 
+export async function deleteBunnyVideo(bunnyVideoId: string): Promise<void> {
+  await fetch(
+    `https://video.bunnycdn.com/library/${process.env.BUNNY_LIBRARY_ID}/videos/${bunnyVideoId}`,
+    { method: 'DELETE', headers: { AccessKey: process.env.BUNNY_API_KEY! } }
+  )
+}
+
+export async function uploadBunnyThumbnail(
+  bunnyVideoId: string,
+  buffer: ArrayBuffer,
+  contentType: string
+): Promise<void> {
+  const res = await fetch(
+    `https://video.bunnycdn.com/library/${process.env.BUNNY_LIBRARY_ID}/videos/${bunnyVideoId}/thumbnail`,
+    {
+      method: 'POST',
+      headers: { AccessKey: process.env.BUNNY_API_KEY!, 'Content-Type': contentType },
+      body: buffer,
+    }
+  )
+  if (!res.ok) throw new Error(`Bunny thumbnail upload failed: ${res.status}`)
+}
+
 export function getStreamUrl(bunnyVideoId: string): string {
   return `https://${process.env.BUNNY_CDN_HOSTNAME}/${bunnyVideoId}/playlist.m3u8`
 }

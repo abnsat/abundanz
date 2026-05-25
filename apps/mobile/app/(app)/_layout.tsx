@@ -19,6 +19,17 @@ function IconDocumentaries({ color }: { color: string }) {
   )
 }
 
+function IconDiscipleship({ color }: { color: string }) {
+  return (
+    <View style={{ width: 28, height: 28, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ width: 16, height: 20, borderWidth: 2, borderColor: color, borderRadius: 2 }} />
+      <View style={{ position: 'absolute', width: 8, height: 2, backgroundColor: color, top: 8 }} />
+      <View style={{ position: 'absolute', width: 8, height: 2, backgroundColor: color, top: 13 }} />
+      <View style={{ position: 'absolute', width: 5, height: 2, backgroundColor: color, top: 18 }} />
+    </View>
+  )
+}
+
 function IconKids({ color }: { color: string }) {
   return (
     <View style={{ width: 28, height: 28, justifyContent: 'center', alignItems: 'center' }}>
@@ -77,6 +88,13 @@ export default function AppLayout() {
         options={{
           title: 'Kids',
           tabBarIcon: ({ color }) => <IconKids color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="discipleship"
+        options={{
+          title: 'Growth',
+          tabBarIcon: ({ color }) => <IconDiscipleship color={color} />,
         }}
       />
       <Tabs.Screen

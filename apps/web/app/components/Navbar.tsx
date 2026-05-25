@@ -2,17 +2,27 @@ import Link from 'next/link'
 import { createClient } from '@/utils/supabase/server'
 import { signOut } from '@/app/actions/auth'
 import { NavbarMobileMenu } from './NavbarMobileMenu'
+import { LanguagePicker } from './LanguagePicker'
+import { SocialMenu } from './SocialMenu'
+import { db } from '@/utils/db'
+import { users } from '@abundanz/shared'
+import { eq } from 'drizzle-orm'
 
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Movies', href: '/?category=Movies' },
   { label: 'Documentaries', href: '/?category=Documentaries' },
   { label: 'Kids', href: '/?category=Kids' },
+  { label: 'Discipleship', href: '/?category=Discipleship' },
 ]
 
 export async function Navbar() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+
+  const [userRow] = user
+    ? await db.select({ preferredLanguage: users.preferredLanguage }).from(users).where(eq(users.id, user.id))
+    : []
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex items-center gap-4 md:gap-8 px-4 md:px-8 py-3 md:py-4 bg-black/90 pointer-events-none">
@@ -59,6 +69,8 @@ export async function Navbar() {
               </svg>
               Account
             </Link>
+            <LanguagePicker currentLanguage={userRow?.preferredLanguage ?? null} />
+            <SocialMenu />
             <form action={signOut}>
               <button
                 type="submit"
@@ -90,6 +102,7 @@ export async function Navbar() {
             firstName: user.user_metadata?.first_name,
             email: user.email,
           } : null}
+          preferredLanguage={userRow?.preferredLanguage ?? null}
         />
       </div>
     </nav>

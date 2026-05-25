@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
-import { videos } from '@abundanz/shared'
+import { videos, users } from '@abundanz/shared'
 import { db } from '@/utils/db'
-import { desc, eq } from 'drizzle-orm'
+import { desc, eq, and } from 'drizzle-orm'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Video } from '@abundanz/shared'
@@ -26,7 +26,16 @@ export default async function CatalogPage({ searchParams }: Props) {
   const { data: { user } } = await supabase.auth.getUser()
 
   const { category: activeCategory } = await searchParams
-  const allVideos = await db.select().from(videos).where(eq(videos.status, 'ready')).orderBy(desc(videos.createdAt))
+
+  const [userRow] = user
+    ? await db.select({ preferredLanguage: users.preferredLanguage }).from(users).where(eq(users.id, user.id))
+    : []
+  const languageFilter = userRow?.preferredLanguage ?? null
+
+  const whereClause = languageFilter
+    ? and(eq(videos.status, 'ready'), eq(videos.language, languageFilter))
+    : eq(videos.status, 'ready')
+  const allVideos = await db.select().from(videos).where(whereClause).orderBy(desc(videos.createdAt))
 
   const byCategory = allVideos.reduce<Record<string, Video[]>>((acc, v) => {
     const cat = v.category ?? 'Other'
@@ -93,6 +102,11 @@ export default async function CatalogPage({ searchParams }: Props) {
               {featured.durationSeconds && (
                 <span className="text-xs text-zinc-400">
                   {formatDuration(featured.durationSeconds)}
+                </span>
+              )}
+              {!languageFilter && featured.language && (
+                <span className="text-[10px] font-semibold tracking-wider uppercase text-zinc-500 border border-zinc-700 px-2 py-0.5 rounded-sm">
+                  {featured.language}
                 </span>
               )}
             </div>
@@ -173,11 +187,18 @@ export default async function CatalogPage({ searchParams }: Props) {
                     )}
                   </div>
 
-                  {video.durationSeconds && (
-                    <span className="text-[11px] text-zinc-500 mb-1 block">
-                      {formatDuration(video.durationSeconds)}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2 mb-1">
+                    {video.durationSeconds && (
+                      <span className="text-[11px] text-zinc-500">
+                        {formatDuration(video.durationSeconds)}
+                      </span>
+                    )}
+                    {!languageFilter && video.language && (
+                      <span className="text-[10px] font-medium text-zinc-600 bg-zinc-900 border border-zinc-800 px-1.5 py-px rounded">
+                        {video.language}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm font-medium text-zinc-300 line-clamp-2 group-hover:text-white transition-colors leading-snug">
                     {video.title}
                   </p>

@@ -8,9 +8,11 @@ const publicColumns = {
   title: videos.title,
   description: videos.description,
   category: videos.category,
+  language: videos.language,
   thumbnailUrl: videos.thumbnailUrl,
   previewUrl: videos.previewUrl,
   durationSeconds: videos.durationSeconds,
+  status: videos.status,
   createdAt: videos.createdAt,
 }
 

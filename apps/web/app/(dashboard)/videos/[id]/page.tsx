@@ -1,13 +1,14 @@
 import { createClient } from '@/utils/supabase/server'
-import { videos } from '@abundanz/shared'
+import { videos, videoReactions, users } from '@abundanz/shared'
 import { db } from '@/utils/db'
-import { eq, ne, and } from 'drizzle-orm'
+import { eq, ne, and, count } from 'drizzle-orm'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { VideoPlayer } from '@/app/components/VideoPlayer'
 import { isSubscribed } from '@/utils/subscription'
 import { Navbar } from '@/app/components/Navbar'
+import { ReactionBar } from '@/app/components/ReactionBar'
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600)
@@ -34,6 +35,19 @@ export default async function VideoPage({ params }: Props) {
   const related = video.category
     ? await db.select().from(videos).where(and(eq(videos.category, video.category), ne(videos.id, id)))
     : []
+
+  const [userRow] = await db.select({ preferredLanguage: users.preferredLanguage })
+    .from(users).where(eq(users.id, user.id))
+  const showLanguage = !userRow?.preferredLanguage
+
+  const [[likesRow], [dislikesRow], [userReactionRow]] = await Promise.all([
+    db.select({ count: count() }).from(videoReactions)
+      .where(and(eq(videoReactions.videoId, id), eq(videoReactions.reaction, 'like'))),
+    db.select({ count: count() }).from(videoReactions)
+      .where(and(eq(videoReactions.videoId, id), eq(videoReactions.reaction, 'dislike'))),
+    db.select({ reaction: videoReactions.reaction }).from(videoReactions)
+      .where(and(eq(videoReactions.videoId, id), eq(videoReactions.userId, user.id))),
+  ]).catch(() => [[undefined], [undefined], [undefined]])
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -71,6 +85,12 @@ export default async function VideoPage({ params }: Props) {
                 {formatDuration(video.durationSeconds)}
               </span>
             )}
+            <ReactionBar
+              videoId={id}
+              initialLikes={likesRow?.count ?? 0}
+              initialDislikes={dislikesRow?.count ?? 0}
+              initialUserReaction={(userReactionRow?.reaction ?? null) as 'like' | 'dislike' | null}
+            />
           </div>
 
           {video.description && (
@@ -109,11 +129,18 @@ export default async function VideoPage({ params }: Props) {
                       </div>
                     </div>
                   </div>
-                  {v.durationSeconds && (
-                    <span className="text-[11px] text-zinc-500 mb-1 block">
-                      {formatDuration(v.durationSeconds)}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2 mb-1">
+                    {v.durationSeconds && (
+                      <span className="text-[11px] text-zinc-500">
+                        {formatDuration(v.durationSeconds)}
+                      </span>
+                    )}
+                    {showLanguage && v.language && (
+                      <span className="text-[10px] font-medium text-zinc-600 bg-zinc-900 border border-zinc-800 px-1.5 py-px rounded">
+                        {v.language}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors leading-snug line-clamp-2">
                     {v.title}
                   </p>
