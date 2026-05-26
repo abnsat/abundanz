@@ -1,4 +1,4 @@
-import { CategoryScreen } from './_components/CategoryScreen'
+import { CategoryScreen } from '@/components/CategoryScreen'
 
 export default function DocumentariesScreen() {
   return <CategoryScreen category="Documentaries" />
