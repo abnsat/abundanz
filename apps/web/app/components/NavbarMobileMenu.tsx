@@ -24,8 +24,26 @@ export function NavbarMobileMenu({ navLinks, user, preferredLanguage }: Props) {
   const router = useRouter()
 
   useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    if (open) {
+      const scrollY = window.scrollY
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${scrollY}px`
+      document.body.style.width = '100%'
+      document.body.style.overflow = 'hidden'
+    } else {
+      const scrollY = document.body.style.top
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+      document.body.style.overflow = ''
+      if (scrollY) window.scrollTo(0, -parseInt(scrollY))
+    }
+    return () => {
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+      document.body.style.overflow = ''
+    }
   }, [open])
 
   async function selectLanguage(lang: string | null) {
@@ -84,7 +102,7 @@ export function NavbarMobileMenu({ navLinks, user, preferredLanguage }: Props) {
         </div>
 
         {/* Nav links */}
-        <nav className="flex flex-col px-4 py-2 gap-1 flex-1">
+        <nav className="flex flex-col px-4 py-2 gap-1 flex-1 overflow-y-auto">
           {navLinks.map(({ label, href }) => (
             <Link
               key={label}
