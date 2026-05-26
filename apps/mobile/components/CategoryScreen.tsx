@@ -135,26 +135,32 @@ export function CategoryScreen({ category }: Props) {
         contentContainerStyle={styles.grid}
         columnWrapperStyle={styles.gridRow}
         ListFooterComponent={<View style={{ height: 40 }} />}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card} onPress={() => handleVideoPress(item.id)} activeOpacity={0.8}>
-            <View style={styles.cardThumb}>
-              {item.thumbnailUrl ? (
-                <Image source={{ uri: item.thumbnailUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" />
-              ) : (
-                <Text style={styles.playIcon}>▶</Text>
+        renderItem={({ item }) => {
+          const mins = item.durationSeconds ? Math.floor(item.durationSeconds / 60) : null
+          const secs = item.durationSeconds ? item.durationSeconds % 60 : null
+          const duration = mins !== null && secs !== null ? `${mins}:${String(secs).padStart(2, '0')}` : null
+          return (
+            <TouchableOpacity style={styles.card} onPress={() => handleVideoPress(item.id)} activeOpacity={0.8}>
+              <View style={styles.cardThumb}>
+                {item.thumbnailUrl ? (
+                  <Image source={{ uri: item.thumbnailUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+                ) : (
+                  <Text style={styles.playIcon}>▶</Text>
+                )}
+                {isGuest && (
+                  <View style={styles.lockOverlay}>
+                    <Ionicons name="lock-closed" size={16} color="white" />
+                  </View>
+                )}
+              </View>
+              <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
+              {duration && <Text style={styles.cardDuration}>{duration}</Text>}
+              {item.language && (
+                <Text style={styles.cardLang}>{item.language}</Text>
               )}
-              {isGuest && (
-                <View style={styles.lockOverlay}>
-                  <Ionicons name="lock-closed" size={16} color="white" />
-                </View>
-              )}
-            </View>
-            <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
-            {item.language && (
-              <Text style={styles.cardLang}>{item.language}</Text>
-            )}
-          </TouchableOpacity>
-        )}
+            </TouchableOpacity>
+          )
+        }}
       />
     </View>
   )
@@ -236,7 +242,8 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   cardTitle: { color: '#a1a1aa', fontSize: 12, lineHeight: 16, fontWeight: '500' },
-  cardLang: { color: '#52525b', fontSize: 10, marginTop: 3 },
+  cardDuration: { color: '#52525b', fontSize: 10, marginTop: 2 },
+  cardLang: { color: '#52525b', fontSize: 10, marginTop: 2 },
   langBadge: {
     alignSelf: 'flex-start',
     borderWidth: 1,
