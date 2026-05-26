@@ -212,9 +212,9 @@ export default function VideoScreen() {
                   activeOpacity={0.75}
                 >
                   {item.thumbnailUrl ? (
-                    <Image source={{ uri: item.thumbnailUrl }} style={[styles.thumbnail, { width: CARD_WIDTH, height: CARD_WIDTH * 9 / 16 }]} resizeMode="cover" />
+                    <Image source={{ uri: item.thumbnailUrl }} style={[styles.thumbnail, { width: CARD_WIDTH, height: CARD_WIDTH * 3 / 2 }]} resizeMode="cover" />
                   ) : (
-                    <View style={[styles.thumbnailPlaceholder, { width: CARD_WIDTH, height: CARD_WIDTH * 9 / 16 }]} />
+                    <View style={[styles.thumbnailPlaceholder, { width: CARD_WIDTH, height: CARD_WIDTH * 3 / 2 }]} />
                   )}
                   <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
                   {itemDuration && <Text style={styles.cardDuration}>{itemDuration}</Text>}
