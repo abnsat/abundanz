@@ -1,17 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
+import { getUserFromRequest } from '@/utils/supabase/api-auth'
 import { db } from '@/utils/db'
 import { videoReactions } from '@abundanz/shared'
 import { eq, and, count } from 'drizzle-orm'
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUserFromRequest(req)
 
   const [likesRow] = await db
     .select({ count: count() })

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
+import { getUserFromRequest } from '@/utils/supabase/api-auth'
 import { db } from '@/utils/db'
 import { videoReactions } from '@abundanz/shared'
 import { eq, and, count } from 'drizzle-orm'
@@ -10,8 +10,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUserFromRequest(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   if (!await isSubscribed(user.id)) return NextResponse.json({ error: 'Subscription required' }, { status: 403 })
 
