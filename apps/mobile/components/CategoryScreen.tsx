@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     right: 0,
     paddingHorizontal: GRID_PADDING,
     paddingTop: 24,
-    paddingBottom: 88,
+    paddingBottom: 28,
   },
   heroTitle: {
     color: '#fff',
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   heroButtonText: { color: '#000', fontWeight: '700', fontSize: 14 },
   centered: { paddingVertical: 40, alignItems: 'center', paddingHorizontal: 32 },
-  categoryHeader: { paddingHorizontal: GRID_PADDING, paddingTop: 8, paddingBottom: 8, marginTop: -40 },
+  categoryHeader: { paddingHorizontal: GRID_PADDING, paddingTop: 16, paddingBottom: 8, marginTop: 8 },
   categoryTitle: { color: '#a1a1aa', fontSize: 17, fontWeight: '600', letterSpacing: 1.5, textTransform: 'uppercase', includeFontPadding: false, paddingBottom: 10 },
   grid: { backgroundColor: '#000', paddingTop: 0 },
   gridRow: { justifyContent: 'space-between', marginBottom: GRID_GAP, paddingHorizontal: GRID_PADDING, marginTop: 0 },
